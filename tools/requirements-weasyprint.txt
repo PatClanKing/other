@@ -1,0 +1,5 @@
+# Optional higher quality engine.
+# On Windows this also needs the GTK runtime (Pango, Cairo) installed system wide.
+# On macOS: brew install pango. On Debian/Ubuntu: apt install libpango-1.0-0 libpangoft2-1.0-0.
+-r requirements.txt
+weasyprint>=61

@@ -1,0 +1,21 @@
+# Anything produced by the scripts in tools/. None of it belongs in the repository:
+# it is all regenerated from the Markdown sources by running the tools again.
+
+# Default output directory for md2pdf.py and github_preview.py, at any depth.
+out/
+
+# Python virtual environments created by setup.sh, setup.ps1 and the .bat launchers.
+.venv/
+venv/
+
+# Python bytecode.
+__pycache__/
+*.py[cod]
+
+# Rendered previews, wherever they are written. github_preview.py always uses this
+# suffix, so this catches them even when --out-dir points somewhere else.
+*.github.html
+
+# Note: md2pdf.py names its output <source>.pdf with no distinguishing suffix, so a PDF
+# written outside out/ via --out-dir is not covered by any pattern here. Either keep the
+# default output directory, or add the directory you chose to this file.
