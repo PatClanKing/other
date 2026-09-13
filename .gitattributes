@@ -1,3 +1,11 @@
+# Normalise every text file to LF inside the repository, whatever the working tree
+# uses. Without this, a checkout on Windows turns CRLF back into the committed bytes
+# and every file looks modified.
+* text=auto
+
 # Batch and PowerShell scripts must keep Windows line endings.
 *.bat text eol=crlf
 *.ps1 text eol=crlf
+
+# Shell scripts must keep Unix line endings, or Git Bash fails on the stray CR.
+*.sh text eol=lf

@@ -1,4 +1,3 @@
-# Core Markdown to PDF pipeline. Pure Python, no native libraries required.
+# Markdown preview pipeline. Pure Python, no native libraries required.
 markdown>=3.6
 pygments>=2.17
-xhtml2pdf>=0.2.16

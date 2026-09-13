@@ -2,7 +2,7 @@
 
 Practical runbook for creating an SSH (Secure Shell) key, loading it into the SSH agent, registering it with GitHub, and proving the whole chain works.
 
-Everything here stays inside Git Bash. The commands are plain POSIX (Portable Operating System Interface) shell, so the same lines also work on macOS and Linux.
+Everything here targets Git Bash on Windows and assumes you are typing into it. Most of the commands are plain POSIX (Portable Operating System Interface) shell and would carry over to macOS or Linux unchanged, but this document does not cover those platforms, because the parts that make it work are Windows specific: `clip.exe`, `winpty`, `MSYS_NO_PATHCONV` and `/c/...` drive paths.
 
 Every command is copy pasteable.
 
@@ -18,13 +18,13 @@ Every command is copy pasteable.
   * [3.1 See what you already have](#31-see-what-you-already-have)
   * [3.2 Choose a key type (ranked)](#32-choose-a-key-type-ranked)
   * [3.3 Generate the key](#33-generate-the-key)
-  * [3.4 Get the ssh-agent running](#34-get-the-ssh-agent-running)
+  * [3.4 Get the `ssh-agent` running](#34-get-the-ssh-agent-running)
   * [3.5 Load the key into the agent](#35-load-the-key-into-the-agent)
   * [3.6 Verify the agent and the loaded keys](#36-verify-the-agent-and-the-loaded-keys)
   * [3.7 Register the public key with GitHub (ranked)](#37-register-the-public-key-with-github-ranked)
   * [3.8 Test the connection to GitHub manually](#38-test-the-connection-to-github-manually)
   * [3.9 Verify you are talking to the real GitHub](#39-verify-you-are-talking-to-the-real-github)
-  * [3.10 The ~/.ssh/config file](#310-the-sshconfig-file)
+  * [3.10 The `~/.ssh/config` file](#310-the-sshconfig-file)
   * [3.11 Make Git actually use the key](#311-make-git-actually-use-the-key)
 * [4. Multiple GitHub accounts or keys](#4-multiple-github-accounts-or-keys)
 * [5. Optional: sign commits with the same SSH key](#5-optional-sign-commits-with-the-same-ssh-key)
@@ -50,11 +50,11 @@ Every command is copy pasteable.
    which -a ssh && git config --global --get core.sshCommand
    ```
    You want `/usr/bin/ssh` and empty output.
-3. Drive letters are mounted under a single slash, so a folder like `C:\git\misc` is `/c/git/misc`.
-4. Paths starting with `/` are sometimes rewritten by MSYS2, the Unix compatibility layer Git Bash is built on. If an argument gets mangled, prefix the command with `MSYS_NO_PATHCONV=1`.
+3. Drive letters are mounted under a single slash, so a folder like `C:\git\<repo>` is `/c/git/<repo>`.
+4. Paths starting with `/` are sometimes rewritten by MSYS2 (the Unix compatibility layer Git Bash is built on). If an argument gets mangled, prefix the command with `MSYS_NO_PATHCONV=1`.
 5. If an interactive prompt hangs or you see `the input device is not a TTY`, prefix the command with `winpty`, for example `winpty ssh -T git@github.com`.
 6. `clip.exe` is the clipboard helper Git Bash gives you, used in section 3.7.
-7. **Every step below starts with a "Run from" line** telling you which directory to be in. Most steps work from anywhere because the paths are absolute, but the Git steps genuinely need you to be inside a repository. Check where you are at any time:
+7. **Every step below that runs a command starts with a "Run from" line** telling you which directory to be in. Most steps work from anywhere because the paths are absolute, but the Git steps genuinely need you to be inside a repository. Check where you are at any time:
    ```bash
    pwd
    ```
@@ -119,7 +119,7 @@ Eleven steps, in order. Each step is numbered so you can jump straight back to i
 mkdir -p ~/.ssh && chmod 700 ~/.ssh && cd ~/.ssh && pwd
 ```
 
-Expected output: `/c/Users/<you>/.ssh`
+Expected output: `/c/Users/<username>/.ssh`
 
 #### 3.1.1 Which SSH client is this shell using?
 
@@ -135,7 +135,7 @@ Then check the version of the one that wins:
 ssh -V
 ```
 
-1. `/usr/bin/ssh` is the Git Bash OpenSSH and the assumption of this whole guide.
+1. Confirm the winner is `/usr/bin/ssh`, the Git Bash OpenSSH, which is the assumption of this whole guide. Windows ships a second OpenSSH under `/c/Windows/System32/OpenSSH`, and that one keeps its own separate agent, so a key loaded here is invisible to it.
 2. Check which client Git itself will call:
    ```bash
    git config --global --get core.sshCommand
@@ -260,15 +260,15 @@ ssh-keygen -y -f ~/.ssh/id_ed25519 > ~/.ssh/id_ed25519.pub
 
 Three ways to have an agent available when you need one:
 
-| Rank | Option | Best for | Trade off |
-|------|--------|----------|-----------|
-| 1 | **Agent auto started from `~/.bashrc`** | Everyday use | Passphrase once per reboot, and every Git Bash window shares the one agent |
-| 2 | **1Password or Bitwarden SSH agent** | Teams already using that password manager | Biometric unlock instead of a passphrase, but adds a dependency and an `IdentityAgent` line in `~/.ssh/config` |
-| 3 | **`eval "$(ssh-agent -s)"` typed per shell** | One off work, CI (Continuous Integration) | Dies with the shell, and each new window starts a fresh empty agent |
+| Rank | Option | Best for | Trade off | Set up in |
+|------|--------|----------|-----------|-----------|
+| 1 | **Agent auto started from `~/.bashrc`** | Everyday use | Passphrase once per reboot, and every Git Bash window shares the one agent | Section 3.4.2 |
+| 2 | **1Password or Bitwarden SSH agent** | Teams already using that password manager | Biometric unlock instead of a passphrase, but adds a dependency and an `IdentityAgent` line in `~/.ssh/config` | Not covered here, follow the vendor documentation |
+| 3 | **`eval "$(ssh-agent -s)"` typed per shell** | One off work, CI (Continuous Integration) | Dies with the shell, and each new window starts a fresh empty agent | Section 3.4.3 |
 
-Recommendation: **option 1**. It is option 3 plus five lines of `~/.bashrc`, and it removes the most common daily annoyance, which is a new terminal window that has forgotten your key.
+Recommendation: **rank 1**. It is rank 3 plus five lines of `~/.bashrc`, and it removes the most common daily annoyance, which is a new terminal window that has forgotten your key. Rank 2 is the only one with no subsection below, because the setup belongs to the password manager rather than to Git Bash.
 
-#### 3.4.2 Option 1, start it now and make it persistent
+#### 3.4.2 Start an agent now and keep it across windows
 
 Start it in the current shell:
 
@@ -303,7 +303,7 @@ source ~/.bashrc
 grep -q 'bashrc' ~/.bash_profile 2>/dev/null || echo '[ -f ~/.bashrc ] && . ~/.bashrc' >> ~/.bash_profile
 ```
 
-#### 3.4.3 Option 3, ad hoc for one shell
+#### 3.4.3 Start a throwaway agent for one shell
 
 Start an agent that lives only as long as this window. The `eval` matters: `ssh-agent -s` only prints the environment variables, so without it the agent starts but this shell never learns how to reach it.
 
@@ -333,11 +333,7 @@ Add with a lifetime, the agent forgets it after 8 hours:
 ssh-add -t 8h ~/.ssh/id_ed25519
 ```
 
-On macOS, store the passphrase in the Keychain so it survives reboots:
-
-```bash
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519
-```
+Git Bash has no system keychain to hand the passphrase to, so the agent forgets the key when the machine restarts. The `~/.bashrc` block in section 3.4.2 is the Git Bash answer to that: it reloads the key into one shared agent on the first terminal you open, so you type the passphrase once per reboot rather than once per window.
 
 ---
 
@@ -465,33 +461,22 @@ Print it:
 cat ~/.ssh/id_ed25519.pub
 ```
 
-Copy it to the clipboard:
+Copy it to the clipboard. `clip.exe` is the Windows clipboard tool, and Git Bash can pipe straight into it:
 
 ```bash
 cat ~/.ssh/id_ed25519.pub | clip.exe
 ```
 
-The same thing on macOS:
-
-```bash
-pbcopy < ~/.ssh/id_ed25519.pub
-```
-
-And on Linux running X11:
-
-```bash
-xclip -sel clip < ~/.ssh/id_ed25519.pub
-```
-
-Three ways to hand that key to GitHub, ranked:
+Two ways to hand that key to GitHub, ranked:
 
 | Rank | Option | How | Notes |
 |------|--------|-----|-------|
 | 1 | GitHub CLI (Command Line Interface) | `gh ssh-key add ~/.ssh/id_ed25519.pub --title "gitbash-laptop"` | Fastest and scriptable, needs `gh auth login` first. Manual: <https://cli.github.com/manual/gh_ssh-key_add> |
-| 2 | Web interface | <https://github.com/settings/keys> then "New SSH key" | No extra tooling, works everywhere |
-| 3 | Signing key upload | `gh ssh-key add ~/.ssh/id_ed25519.pub --type signing --title "sign-laptop"` | Only needed if you also sign commits, section 5 |
+| 2 | Web interface | <https://github.com/settings/keys> then "New SSH key" | No extra tooling, and the only route on a machine without `gh` |
 
-Concrete CLI commands:
+Both routes register the key for **authentication**. Signing commits needs the same public key uploaded a second time as a separate signing key, which is section 5.
+
+Concrete commands for rank 1. Authenticate `gh` first, which opens a browser and stores a token, so it is a one time step per machine:
 
 ```bash
 gh auth login
@@ -627,7 +612,7 @@ Confirm the live values yourself from the GitHub metadata API (Application Progr
 curl -s https://api.github.com/meta | jq '.ssh_key_fingerprints'
 ```
 
-Without `jq` installed, which is the default in Git Bash:
+Git Bash does not ship `jq`, so without it installed:
 
 ```bash
 curl -s https://api.github.com/meta | grep -A4 ssh_key_fingerprints
@@ -699,10 +684,15 @@ Host github.com
   AddKeysToAgent yes
   ServerAliveInterval 60
 EOF
+```
+
+Then tighten the permissions, because SSH refuses to read a config file that anyone else can write:
+
+```bash
 chmod 600 ~/.ssh/config
 ```
 
-Or edit it by hand:
+Or edit it by hand instead:
 
 ```bash
 nano ~/.ssh/config
@@ -735,7 +725,7 @@ That prints the fully resolved settings SSH will use, including which `identityf
 **Run from: inside the repository you want to change.** This is the one section where the directory genuinely matters, because `git remote` only works inside a work tree. For example:
 
 ```bash
-cd /c/git/misc && pwd
+cd /c/git/<repo> && pwd
 ```
 
 Confirm you really are in a repository before running anything else here:
@@ -800,7 +790,7 @@ GIT_SSH_COMMAND="ssh -v" git ls-remote git@github.com:<owner>/<repo>.git 2>&1 | 
 cd ~/.ssh && pwd
 ```
 
-A single key cannot be attached to two GitHub accounts, so use one key per account plus a host alias in `~/.ssh/config`:
+A single key cannot be attached to two GitHub accounts, so use one key per account plus a host alias. Append both blocks to the `~/.ssh/config` file from section 3.10.2, with the same heredoc or editor:
 
 ```sshconfig
 Host github-personal
@@ -842,9 +832,21 @@ Each test should greet you with the matching username.
 
 **Run from:** anywhere for the `git config --global` lines, then inside a repository for the `git log` verification at the end.
 
+Tell Git to sign with SSH rather than with its default signing backend:
+
 ```bash
 git config --global gpg.format ssh
+```
+
+Point it at the key. Git wants the **public** half here, unlike every other step in this document:
+
+```bash
 git config --global user.signingkey ~/.ssh/id_ed25519.pub
+```
+
+Sign every commit from now on, so you never have to remember the `-S` flag:
+
+```bash
 git config --global commit.gpgsign true
 ```
 
@@ -872,11 +874,23 @@ Reference: <https://docs.github.com/en/authentication/managing-commit-signature-
 cd ~/.ssh && pwd
 ```
 
-SSH refuses to use a private key that other users can read:
+SSH refuses to use a private key that other users can read, so three commands set the directory and then each class of file inside it.
+
+The directory itself, reachable only by you:
 
 ```bash
 chmod 700 ~/.ssh
+```
+
+The private key and the client config, readable and writable by you alone:
+
+```bash
 chmod 600 ~/.ssh/id_ed25519 ~/.ssh/config
+```
+
+The public key and `known_hosts`, which are not secret and may stay world readable:
+
+```bash
 chmod 644 ~/.ssh/id_ed25519.pub ~/.ssh/known_hosts
 ```
 
@@ -917,7 +931,7 @@ Find the symptom in the first column, run the command in the third to confirm th
 
 **Run from:** anywhere, `cd ~` is a fine default.
 
-Paste the whole block into Git Bash. Every line should pass before you call it done.
+Paste the whole block into Git Bash. This is the one place in the document where several commands share a fence, because the point is to run them together as one sweep rather than to study them individually.
 
 ```bash
 ssh -V
@@ -933,6 +947,22 @@ ssh -T git@github.com
 git config --global --get core.sshCommand
 ```
 
+What each line should print, in the same order. If one does not match, the last column says which section fixes it:
+
+| Command | Passing looks like | If not |
+|---------|--------------------|--------|
+| `ssh -V` | `OpenSSH_` followed by 7.0 or newer | Section 3.1.1 |
+| `command -v ssh` | `/usr/bin/ssh` | Section 3.1.1 |
+| `echo "SSH_AUTH_SOCK=..."` | A socket path, not `<none>` | Section 3.4 |
+| `ps aux \| grep ...` | At least one `ssh-agent` line | Section 3.4 |
+| `ssh-add -l; echo ...` | Your key listed, then `ssh-add exit: 0` | Section 3.5 |
+| `ssh-keygen -l -f ~/.ssh/id_ed25519.pub` | The same `SHA256:` value the previous line printed | Section 3.6.3 |
+| `ssh -G github.com \| grep ...` | `identityfile ~/.ssh/id_ed25519` and `identitiesonly yes` | Section 3.10.3 |
+| `ssh-keygen -F github.com \| head -1` | `# Host github.com found: line 1` | Section 3.9 |
+| `ssh-keyscan github.com \| ssh-keygen -lf -` | Fingerprints matching the three listed in section 3.9 | Section 3.9 |
+| `ssh -T git@github.com` | `Hi <username>! You've successfully authenticated...` | Section 3.8 |
+| `git config --global --get core.sshCommand` | Nothing at all | Section 3.1.1 |
+
 ---
 
 ## 9. Cheat sheet
@@ -941,7 +971,7 @@ Once the setup works, this is the only section you should need again:
 
 | Task | Command |
 |------|---------|
-| Generate key | `ssh-keygen -t ed25519 -C "email"` |
+| Generate key | `ssh-keygen -t ed25519 -C "<email>" -f ~/.ssh/id_ed25519` |
 | Show public key | `cat ~/.ssh/id_ed25519.pub` |
 | Copy public key | `cat ~/.ssh/id_ed25519.pub \| clip.exe` |
 | Fingerprint of a key file | `ssh-keygen -l -f ~/.ssh/id_ed25519.pub` |
@@ -958,7 +988,7 @@ Once the setup works, this is the only section you should need again:
 | Verbose test | `ssh -vT git@github.com` |
 | Test one specific key | `ssh -T -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes git@github.com` |
 | Test port 443 fallback | `ssh -T -p 443 git@ssh.github.com` |
-| Debug what Git does | `GIT_SSH_COMMAND="ssh -v" git ls-remote git@github.com:o/r.git` |
+| Debug what Git does | `GIT_SSH_COMMAND="ssh -v" git ls-remote git@github.com:<owner>/<repo>.git` |
 | Resolved SSH config | `ssh -G github.com` |
 | Host key fingerprint seen | `ssh-keyscan github.com \| ssh-keygen -lf -` |
 | Forget a host key | `ssh-keygen -R github.com` |
@@ -973,20 +1003,28 @@ Once the setup works, this is the only section you should need again:
 
 ## 10. Terminology
 
-Every acronym is also expanded where it first appears, so you can read straight through without coming here. This section is for looking one up later.
+Every acronym is also expanded where it first appears, so you can read straight through without coming here. This section is for looking one up later, so it carries every term the document uses, listed alphabetically.
 
-
-1. **SSH** = Secure Shell, the protocol Git uses over port 22 for authenticated pushes and pulls.
-2. **Key pair** = a private key (secret, stays on your machine) and a public key (`.pub`, safe to publish).
-3. **`ssh-agent`** = a background process that holds your decrypted private key in memory so you type the passphrase once per session.
-4. **Ed25519** = Edwards curve Digital Signature Algorithm, 255 bit curve. Modern default key type.
-5. **RSA** = Rivest Shamir Adleman, the legacy key type, still accepted at 4096 bits.
-6. **FIDO2** = Fast IDentity Online v2, the standard behind hardware security keys such as YubiKey.
-7. **CLI** = Command Line Interface. **`gh`** = the official GitHub CLI.
-8. **PAT** = Personal Access Token, the HTTPS (HyperText Transfer Protocol Secure) alternative to SSH keys.
-9. **TOFU** = Trust On First Use, the model where SSH remembers a server host key the first time you connect.
-10. **known_hosts** = `~/.ssh/known_hosts`, the local record of server host keys SSH has accepted.
-11. **MSYS2** = the Unix compatibility layer Git Bash is built on. It is why `~` and `/c/...` paths work.
+1. **API** = Application Programming Interface. Used here for <https://api.github.com/meta>, which publishes GitHub's live host key fingerprints.
+2. **CI** = Continuous Integration, an automated build server. It matters here because a CI job starts in a fresh shell with no agent in it.
+3. **CLI** = Command Line Interface. **`gh`** = the official GitHub CLI.
+4. **DSA** = Digital Signature Algorithm, an obsolete key type removed from modern OpenSSH. Never generate one.
+5. **ECDSA** = Elliptic Curve Digital Signature Algorithm, the older elliptic curve key type. Still accepted, superseded by Ed25519.
+6. **Ed25519** = Edwards curve Digital Signature Algorithm, 255 bit curve. Modern default key type.
+7. **FIDO2** = Fast IDentity Online v2, the standard behind hardware security keys such as YubiKey.
+8. **HTTP** = HyperText Transfer Protocol, the protocol whose status 200 the references section quotes.
+9. **HTTPS** = HyperText Transfer Protocol Secure, the clone method this document replaces with SSH.
+10. **IP** = Internet Protocol. GitHub publishes its address ranges next to the fingerprints at <https://api.github.com/meta>.
+11. **Key pair** = a private key (secret, stays on your machine) and a public key (`.pub`, safe to publish).
+12. **known_hosts** = `~/.ssh/known_hosts`, the local record of server host keys SSH has accepted.
+13. **MSYS2** = the Unix compatibility layer Git Bash is built on. It is why `~` and `/c/...` paths work.
+14. **POSIX** = Portable Operating System Interface, the standard the Git Bash shell follows.
+15. **RSA** = Rivest Shamir Adleman, the legacy key type, still accepted at 4096 bits.
+16. **SSH** = Secure Shell, the protocol Git uses over port 22 for authenticated pushes and pulls.
+17. **`ssh-agent`** = a background process that holds your decrypted private key in memory so you type the passphrase once per session.
+18. **TCP** = Transmission Control Protocol, the transport SSH runs over. Section 3.8.5 uses the bash `/dev/tcp` pseudo device to test whether port 22 is reachable at all.
+19. **TOFU** = Trust On First Use, the model where SSH remembers a server host key the first time you connect.
+20. **TTY** = TeleTYpe, a terminal a program can prompt on. Git Bash sometimes needs `winpty` to supply one.
 
 ---
 

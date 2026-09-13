@@ -2,7 +2,7 @@
 """Generate or refresh a table of contents in a Markdown file.
 
 GitHub renders a document's outline behind the hamburger icon at the top right, but that
-is hidden behind a click and does not survive export to PDF or any other renderer. A
+is hidden behind a click, and nothing but github.com reproduces it. A
 literal list of anchor links at the top of the file works everywhere, which is why this
 script exists.
 
@@ -43,6 +43,19 @@ def strip_markdown(text: str) -> str:
     text = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"\1", text)  # italic
     text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)     # links
     return text.strip()
+
+
+def link_text(text: str) -> str:
+    """Heading text as it should appear inside a contents entry.
+
+    Only links are removed, because a link nested inside link text does not render.
+    Everything else is kept deliberately. A heading such as "3.4 Get the `ssh-agent`
+    running" must keep its backticks here: stripping them puts a bare hyphenated name
+    back into prose, which is the exact thing the code span was there to prevent, and
+    it would reintroduce a stray dash into a file whose whole point is not to have one.
+    GitHub's slug ignores the backticks either way, so the anchor is unaffected.
+    """
+    return re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text).strip()
 
 
 def github_slug(text: str, seen: dict) -> str:
@@ -97,7 +110,7 @@ def collect_headings(text: str, max_depth: int):
         title = match.group(2)
         slug = github_slug(title, seen)      # slug every heading, so numbering matches
         if level <= max_depth:
-            headings.append((level, strip_markdown(title), slug))
+            headings.append((level, link_text(title), slug))
     return headings
 
 

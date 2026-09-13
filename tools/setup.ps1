@@ -1,15 +1,14 @@
-# Create the Python virtual environment for the Markdown to PDF tool (PowerShell).
+# Create the Python virtual environment for the Markdown preview tool (PowerShell).
 #
-#   .\tools\setup.ps1              # core engine only (pure Python, always works)
-#   .\tools\setup.ps1 -WeasyPrint  # also install WeasyPrint (needs GTK on Windows)
+#   .\tools\setup.ps1         # install the dependencies
+#   .\tools\setup.ps1 -Force  # rebuild the virtual environment from scratch
 #
 # Afterwards:
 #   .\tools\.venv\Scripts\Activate.ps1
-#   python tools\md2pdf.py github-ssh-setup.md --toc
+#   python tools\github_preview.py github-ssh-setup.md
 
 [CmdletBinding()]
 param(
-    [switch]$WeasyPrint,
     [switch]$Force
 )
 
@@ -46,20 +45,13 @@ Write-Host 'Upgrading pip'
 & $PythonExe -m pip install --upgrade pip --quiet
 if ($LASTEXITCODE -ne 0) { throw 'pip upgrade failed.' }
 
-$Requirements = if ($WeasyPrint) {
-    Join-Path $ToolsDir 'requirements-weasyprint.txt'
-} else {
-    Join-Path $ToolsDir 'requirements.txt'
-}
+$Requirements = Join-Path $ToolsDir 'requirements.txt'
 
 Write-Host "Installing from $Requirements"
 & $PythonExe -m pip install -r $Requirements
 if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed.' }
 
 Write-Host ''
-& $PythonExe (Join-Path $ToolsDir 'md2pdf.py') --list-engines
-
-Write-Host ''
 Write-Host 'Done. Next steps:'
 Write-Host '  .\tools\.venv\Scripts\Activate.ps1'
-Write-Host '  python tools\md2pdf.py github-ssh-setup.md --toc'
+Write-Host '  python tools\github_preview.py github-ssh-setup.md'

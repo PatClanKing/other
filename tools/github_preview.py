@@ -22,7 +22,6 @@ Usage:
     python tools/github_preview.py github-ssh-setup.md
     python tools/github_preview.py github-ssh-setup.md --offline
     python tools/github_preview.py *.md --no-open
-    python tools/github_preview.py github-ssh-setup.md --pdf
 """
 
 from __future__ import annotations
@@ -313,7 +312,7 @@ def build_page(md_path: Path, args: argparse.Namespace) -> tuple[str, str]:
         github_css=GITHUB_CSS.read_text(encoding="utf-8"),
         page_css=PAGE_CSS,
         body=body,
-        copy_script="" if args.no_copy_button else COPY_SCRIPT,
+        copy_script=COPY_SCRIPT,
     )
     return html, mode
 
@@ -345,19 +344,9 @@ def parse_args(argv=None) -> argparse.Namespace:
         help="Repository for resolving #123 and @user links, in the form <owner>/<repo>.",
     )
     parser.add_argument(
-        "--pdf",
-        action="store_true",
-        help="Also write a PDF from the same GitHub styled HTML.",
-    )
-    parser.add_argument(
         "--no-open",
         action="store_true",
         help="Do not open the preview in a browser.",
-    )
-    parser.add_argument(
-        "--no-copy-button",
-        action="store_true",
-        help="Omit the copy button on code blocks. Use this when generating a PDF.",
     )
     return parser.parse_args(argv)
 
@@ -391,49 +380,10 @@ def main(argv=None) -> int:
         if first_page is None:
             first_page = html_path
 
-        if args.pdf:
-            pdf_path = out_dir / (md_path.stem + ".github.pdf")
-            try:
-                write_pdf(html, pdf_path, md_path.resolve().parent)
-                print("wrote  %s  (%.1f KB)" % (pdf_path, pdf_path.stat().st_size / 1024))
-            except Exception as exc:
-                print("FAILED %s: %s" % (pdf_path, exc), file=sys.stderr)
-                failures += 1
-
     if first_page is not None and not args.no_open:
         webbrowser.open(first_page.resolve().as_uri())
 
     return 1 if failures else 0
-
-
-def write_pdf(html: str, out_path: Path, base_dir: Path) -> None:
-    """Render the same GitHub styled HTML to PDF, best engine first."""
-    try:
-        from weasyprint import HTML as WeasyHTML
-    except Exception:
-        pass
-    else:
-        WeasyHTML(string=html, base_url=str(base_dir)).write_pdf(str(out_path))
-        return
-
-    try:
-        from xhtml2pdf import pisa
-    except ImportError:
-        raise RuntimeError(
-            "No PDF engine installed. Run the setup script first."
-        )
-
-    # xhtml2pdf ignores most of GitHub's CSS, so the PDF will be a rough
-    # approximation. WeasyPrint gives a faithful result if it is installed.
-    print(
-        "       note: using xhtml2pdf, which supports only a subset of GitHub's CSS. "
-        "Install WeasyPrint (bash tools/setup.sh --weasyprint) for a faithful PDF.",
-        file=sys.stderr,
-    )
-    with out_path.open("wb") as handle:
-        result = pisa.CreatePDF(src=html, dest=handle, encoding="utf-8")
-    if result.err:
-        raise RuntimeError("xhtml2pdf reported %s error(s)" % result.err)
 
 
 if __name__ == "__main__":

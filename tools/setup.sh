@@ -1,29 +1,26 @@
 #!/usr/bin/env bash
-# Create the Python virtual environment for the Markdown to PDF tool.
+# Create the Python virtual environment for the Markdown preview tool.
 # Works in Git Bash on Windows, and on macOS and Linux.
 #
-#   bash tools/setup.sh              # core engine only (pure Python, always works)
-#   bash tools/setup.sh --weasyprint # also install WeasyPrint (needs Pango/Cairo)
-#   bash tools/setup.sh --force      # rebuild the virtual environment from scratch
+#   bash tools/setup.sh         # install the dependencies
+#   bash tools/setup.sh --force # rebuild the virtual environment from scratch
 #
 # Afterwards:
 #   source tools/.venv/Scripts/activate   # Git Bash on Windows
 #   source tools/.venv/bin/activate       # macOS and Linux
-#   python tools/md2pdf.py github-ssh-setup.md --toc
+#   python tools/github_preview.py github-ssh-setup.md
 
 set -euo pipefail
 
 TOOLS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENV_DIR="$TOOLS_DIR/.venv"
 
-WITH_WEASYPRINT=0
 FORCE=0
 for arg in "$@"; do
     case "$arg" in
-        --weasyprint) WITH_WEASYPRINT=1 ;;
-        --force)      FORCE=1 ;;
-        -h|--help)    sed -n '2,14p' "${BASH_SOURCE[0]}"; exit 0 ;;
-        *)            echo "Unknown option: $arg" >&2; exit 2 ;;
+        --force)   FORCE=1 ;;
+        -h|--help) sed -n '2,12p' "${BASH_SOURCE[0]}"; exit 0 ;;
+        *)         echo "Unknown option: $arg" >&2; exit 2 ;;
     esac
 done
 
@@ -67,17 +64,8 @@ fi
 echo "Upgrading pip"
 "$VENV_PY" -m pip install --upgrade pip --quiet
 
-if [ "$WITH_WEASYPRINT" -eq 1 ]; then
-    REQUIREMENTS="$TOOLS_DIR/requirements-weasyprint.txt"
-else
-    REQUIREMENTS="$TOOLS_DIR/requirements.txt"
-fi
-
-echo "Installing from $REQUIREMENTS"
-"$VENV_PY" -m pip install -r "$REQUIREMENTS"
-
-echo
-"$VENV_PY" "$TOOLS_DIR/md2pdf.py" --list-engines
+echo "Installing from $TOOLS_DIR/requirements.txt"
+"$VENV_PY" -m pip install -r "$TOOLS_DIR/requirements.txt"
 
 echo
 echo "Done. Next steps:"
@@ -86,4 +74,4 @@ if [ -x "$VENV_DIR/Scripts/python.exe" ]; then
 else
     echo "  source tools/.venv/bin/activate"
 fi
-echo "  python tools/md2pdf.py github-ssh-setup.md --toc"
+echo "  python tools/github_preview.py github-ssh-setup.md"
