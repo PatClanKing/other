@@ -115,20 +115,27 @@ def collect_headings(text: str, max_depth: int):
 
 
 def render_toc(headings) -> str:
-    """Render the contents as an unordered list.
+    """Render the contents as one link per line, with no list marker.
 
-    Two deliberate choices here. The marker is `*` rather than an ordered `1.` because
-    every heading already begins with its own section number, and an ordered list would
-    render "1. 1. Git Bash specifics". It is `*` rather than the other unordered marker
-    so the file contains no stray dash.
+    Every heading already starts with its own section number, so a list marker puts two
+    markers on each line: the reader sees a bullet and then "3.4". An ordered list is
+    worse, because it renumbers from 1 and cannot produce "3.4" at all. So the lines
+    carry no marker, and each one becomes its own line because GitHub Flavored Markdown
+    turns the single newline between them into a `<br>`. That is the same hard break
+    behaviour `reflow_prose.py` exists to guard against in prose, relied on deliberately
+    here.
+
+    Indentation uses a non breaking space entity rather than literal spaces, because
+    leading whitespace collapses in the rendered HTML and four literal spaces would be
+    read as a code block instead.
     """
     if not headings:
         return ""
     top = min(level for level, _, _ in headings)
     lines = ["## Contents", ""]
     for level, title, slug in headings:
-        indent = "  " * (level - top)
-        lines.append("%s* [%s](#%s)" % (indent, title, slug))
+        indent = "&nbsp;&nbsp;&nbsp;&nbsp;" * (level - top)
+        lines.append("%s[%s](#%s)" % (indent, title, slug))
     return "\n".join(lines)
 
 

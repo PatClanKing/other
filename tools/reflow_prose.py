@@ -40,6 +40,12 @@ LIST_ITEM = re.compile(r"^(\s*)((?:\d+\.|[*+-])\s+)(.*)$")
 QUOTE = re.compile(r"^(\s*)>\s?(.*)$")
 # Markdown's own hard break syntax. If the author asked for a break, keep it.
 EXPLICIT_BREAK = re.compile(r"(  |\\)$")
+# The generated contents block. update_toc.py writes one link per line with no list
+# marker, because every heading already carries its own number and a marker would put
+# two on each line. That makes the block look exactly like hard wrapped prose, which is
+# the shape this script exists to remove, so it has to be skipped rather than joined.
+TOC_START = re.compile(r"^\s*<!--\s*toc\s*-->\s*$")
+TOC_END = re.compile(r"^\s*<!--\s*/toc\s*-->\s*$")
 
 
 def is_block_start(line: str) -> bool:
@@ -62,8 +68,17 @@ def reflow(text: str):
     joins = []
     in_fence = False
     fence_marker = ""
+    in_toc = False
 
     for number, line in enumerate(lines, start=1):
+        if TOC_START.match(line):
+            in_toc = True
+        elif TOC_END.match(line):
+            in_toc = False
+        if in_toc:
+            out.append(line)
+            continue
+
         fence = FENCE.match(line)
         if fence:
             marker = fence.group(2)
