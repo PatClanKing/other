@@ -12,7 +12,9 @@ Whenever you change `github-ssh-setup.md`, regenerate the HTML in the same turn,
 tools/.venv/bin/python tools/github_preview.py github-ssh-setup.md --offline -o .
 ```
 
-Never hand back a change to the Markdown without the matching HTML. Treat the two as one deliverable. The same applies to any other `.md` file that has a generated `.github.html` beside it.
+Never hand back a change to the Markdown without the matching HTML. Treat the two as one deliverable, and commit them together: the HTML is tracked, so a commit touching only the Markdown leaves the published document stale. The same applies to any other `.md` file that has a generated `.github.html` beside it.
+
+Previews written into `tools/out/` stay ignored, because those are throwaway. Only the copy in the repository root is tracked.
 
 On Windows the interpreter is `tools/.venv/Scripts/python.exe`. If `tools/.venv` does not exist, create it with `bash tools/setup.sh` first.
 

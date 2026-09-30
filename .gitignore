@@ -1,7 +1,9 @@
-# Anything produced by the scripts in tools/. None of it belongs in the repository:
-# it is all regenerated from the Markdown sources by running the tools again.
+# Scratch output from the scripts in tools/. The one generated file that IS tracked
+# is github-ssh-setup.github.html in the repository root: it is the form of the
+# document people read, so it is committed alongside the Markdown it comes from.
 
-# Default output directory for github_preview.py, at any depth.
+# Default output directory for github_preview.py, at any depth. Previews written
+# here are throwaway, unlike the tracked copy in the repository root.
 out/
 
 # Python virtual environments created by setup.sh, setup.ps1 and preview-github.bat.
@@ -11,7 +13,3 @@ venv/
 # Python bytecode.
 __pycache__/
 *.py[cod]
-
-# Rendered previews, wherever they are written. github_preview.py always uses this
-# suffix, so this catches them even when --out-dir points somewhere else.
-*.github.html

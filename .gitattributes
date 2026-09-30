@@ -9,3 +9,7 @@
 
 # Shell scripts must keep Unix line endings, or Git Bash fails on the stray CR.
 *.sh text eol=lf
+
+# The tracked preview is generated. Collapse it in diffs and keep it out of the
+# language stats, so a regenerated copy does not bury a real review.
+*.github.html linguist-generated=true
