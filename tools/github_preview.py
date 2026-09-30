@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import html as html_module
+import base64
 import json
 import os
 import re
@@ -280,6 +281,38 @@ def render_offline(markdown_text: str) -> str:
     return converter.convert(markdown_text)
 
 
+MEDIA_TYPES = {
+    ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg", ".gif": "image/gif", ".webp": "image/webp",
+}
+
+
+def inline_images(body: str, base_dir: Path) -> str:
+    """Replace local <img src> with a data URI, so the page is one portable file.
+
+    The point of this HTML is to be handed to somebody. A page that references
+    figures/foo.svg stops working the moment it is copied out of the repository on its
+    own, and the failure is silent: a broken image icon and nothing to say why. Folding
+    each figure into the page costs a third more bytes and removes the whole class of
+    problem. Remote images are left alone, because inlining those would mean fetching
+    them, which is a different decision.
+    """
+    def swap(match):
+        src = match.group(2)
+        if src.startswith(("http://", "https://", "data:", "//")):
+            return match.group(0)
+        asset = (base_dir / src).resolve()
+        media = MEDIA_TYPES.get(asset.suffix.lower())
+        if not asset.is_file() or media is None:
+            print("       note: leaving %s as a link (%s)" % (
+                src, "unreadable" if media else "unknown type"), file=sys.stderr)
+            return match.group(0)
+        payload = base64.b64encode(asset.read_bytes()).decode("ascii")
+        return "%sdata:%s;base64,%s%s" % (match.group(1), media, payload, match.group(3))
+
+    return re.sub(r'(<img[^>]*?\ssrc=")([^"]+)(")', swap, body)
+
+
 def build_page(md_path: Path, args: argparse.Namespace) -> tuple[str, str]:
     text = md_path.read_text(encoding="utf-8")
 
@@ -299,6 +332,8 @@ def build_page(md_path: Path, args: argparse.Namespace) -> tuple[str, str]:
         body = render_offline(text)
 
     body = add_heading_anchors(body)
+    if not args.link_assets:
+        body = inline_images(body, md_path.resolve().parent)
 
     if not GITHUB_CSS.exists():
         sys.exit(
@@ -342,6 +377,12 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument(
         "--context",
         help="Repository for resolving #123 and @user links, in the form <owner>/<repo>.",
+    )
+    parser.add_argument(
+        "--link-assets",
+        action="store_true",
+        help="Reference images by path instead of folding them into the page. "
+             "The result is smaller but only works next to its figures folder.",
     )
     parser.add_argument(
         "--no-open",

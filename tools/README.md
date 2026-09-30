@@ -119,7 +119,7 @@ Then render:
 tools/.venv/bin/python tools/github_preview.py docs/github-ssh-setup.md
 ```
 
-The preview lands beside its source, at `docs/github-ssh-setup.html`.
+The preview lands beside its source, at `docs/github-ssh-setup.html`. Figures are folded into the page as data URIs, so that single file is the whole document: copy it anywhere, email it, open it offline, and the copy buttons still work.
 
 ---
 
@@ -222,6 +222,7 @@ Every option, with the value used when you leave it out:
 | `-o`, `--out-dir` | beside the Markdown | Where the HTML is written |
 | `--offline` | off | Render locally, with no network call |
 | `--context` | none | Repository for resolving `#123` and `@user` links, as `<owner>/<repo>` |
+| `--link-assets` | off | Reference figures by path instead of folding them in. Smaller, but only works beside `figures/` |
 | `--no-open` | off | Do not open the preview in a browser |
 
 ### 8.1 Examples

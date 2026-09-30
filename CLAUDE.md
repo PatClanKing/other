@@ -14,7 +14,7 @@ tools/.venv/bin/python tools/github_preview.py docs/github-ssh-setup.md --offlin
 
 Never hand back a change to the Markdown without the matching HTML. Treat the two as one deliverable, and commit them together: the HTML is tracked, so a commit touching only the Markdown leaves the published document stale. The same applies to any other document in `docs/`.
 
-The HTML is written beside its Markdown by default, because the page references its figures by a path relative to the Markdown. Sending it anywhere else silently breaks every image in it.
+The HTML is written beside its Markdown, and figures are folded into it as data URIs, so the result is one portable file that works anywhere with nothing beside it. `--link-assets` reverses that for a smaller file that only works next to its `figures/` folder.
 
 On Windows the interpreter is `tools/.venv/Scripts/python.exe`. If `tools/.venv` does not exist, create it with `bash tools/setup.sh` first.
 
