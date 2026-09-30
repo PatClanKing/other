@@ -10,23 +10,23 @@ The only output these tools produce is HTML. Code blocks in that HTML carry GitH
 
 ## Contents
 
-* [1. What is here](#1-what-is-here)
-* [2. Easiest route: `preview-github.bat`](#2-easiest-route-preview-githubbat)
-  * [2.1 Four ways to invoke it](#21-four-ways-to-invoke-it)
-* [3. Manual route](#3-manual-route)
-  * [3.1 Git Bash](#31-git-bash)
-  * [3.2 PowerShell](#32-powershell)
-  * [3.3 macOS and Linux](#33-macos-and-linux)
-* [4. How the preview works](#4-how-the-preview-works)
-* [5. Table of contents](#5-table-of-contents)
-* [6. Removing identifying information](#6-removing-identifying-information)
-* [7. Two defects the Markdown source hides](#7-two-defects-the-markdown-source-hides)
-  * [7.1 Blocks and tables nobody introduced](#71-blocks-and-tables-nobody-introduced)
-  * [7.2 Hard wrapped paragraphs](#72-hard-wrapped-paragraphs)
-* [8. Command reference](#8-command-reference)
-  * [8.1 Examples](#81-examples)
-* [9. Troubleshooting](#9-troubleshooting)
-* [10. Verified result](#10-verified-result)
+[1. What is here](#1-what-is-here)
+[2. Easiest route: `github_preview.bat`](#2-easiest-route-github_previewbat)
+&nbsp;&nbsp;&nbsp;&nbsp;[2.1 Four ways to invoke it](#21-four-ways-to-invoke-it)
+[3. Manual route](#3-manual-route)
+&nbsp;&nbsp;&nbsp;&nbsp;[3.1 Git Bash](#31-git-bash)
+&nbsp;&nbsp;&nbsp;&nbsp;[3.2 PowerShell](#32-powershell)
+&nbsp;&nbsp;&nbsp;&nbsp;[3.3 macOS and Linux](#33-macos-and-linux)
+[4. How the preview works](#4-how-the-preview-works)
+[5. Table of contents](#5-table-of-contents)
+[6. Removing identifying information](#6-removing-identifying-information)
+[7. Two defects the Markdown source hides](#7-two-defects-the-markdown-source-hides)
+&nbsp;&nbsp;&nbsp;&nbsp;[7.1 Blocks and tables nobody introduced](#71-blocks-and-tables-nobody-introduced)
+&nbsp;&nbsp;&nbsp;&nbsp;[7.2 Hard wrapped paragraphs](#72-hard-wrapped-paragraphs)
+[8. Command reference](#8-command-reference)
+&nbsp;&nbsp;&nbsp;&nbsp;[8.1 Examples](#81-examples)
+[9. Troubleshooting](#9-troubleshooting)
+[10. Verified result](#10-verified-result)
 
 <!-- /toc -->
 
@@ -36,24 +36,24 @@ The only output these tools produce is HTML. Code blocks in that HTML carry GitH
 
 Ten files do the work, and two generated directories hold the results:
 
-1. `preview-github.bat` Click to run. Opens a GitHub accurate preview in your browser.
+1. `github_preview.bat` Click to run. Opens a GitHub accurate preview in your browser.
 2. `github_preview.py` Renders Markdown the way github.com does, with a copy button on every code block.
-3. `update_toc.py` Generates or refreshes a table of contents in a Markdown file.
-4. `scrub_pii.py` Finds and removes identifying information before publishing.
-5. `check_intros.py` Finds code blocks and tables that nothing introduced.
-6. `reflow_prose.py` Joins hard wrapped prose so GitHub does not break it mid sentence.
+3. `lint/update_toc.py` Generates or refreshes a table of contents in a Markdown file.
+4. `lint/scrub_pii.py` Finds and removes identifying information before publishing.
+5. `lint/check_intros.py` Finds code blocks and tables that nothing introduced.
+6. `lint/reflow_prose.py` Joins hard wrapped prose so GitHub does not break it mid sentence.
 7. `assets/github-markdown.css` GitHub's own stylesheet, vendored so the preview works offline.
 8. `requirements.txt` Dependencies. Pure Python, installs from pip alone.
 9. `setup.sh` One shot environment setup for Git Bash, macOS and Linux.
 10. `setup.ps1` One shot environment setup for PowerShell.
-11. `out/` Generated previews. Ignored by Git.
+11. `out/` Scratch output, if you ask for it. Ignored by Git.
 12. `.venv/` The virtual environment. Ignored by Git.
 
 ---
 
-## 2. Easiest route: `preview-github.bat`
+## 2. Easiest route: `github_preview.bat`
 
-Double click `tools\preview-github.bat` in Explorer. That is the whole procedure.
+Double click `tools\github_preview.bat` in Explorer. That is the whole procedure.
 
 On the first run it creates `tools\.venv` and installs the dependencies, which takes a few seconds. Every run after that is close to instant. When it is done, the preview opens in your default browser.
 
@@ -63,11 +63,11 @@ Each row is a different way to start the same script, and the second column says
 
 | Way | What happens |
 | :--- | :--- |
-| Double click it in Explorer | Previews every `.md` file in the repository root |
+| Double click it in Explorer | Previews every `.md` file in `docs/` |
 | Drag `.md` files onto it | Previews only the files you dropped |
-| `tools\preview-github.bat doc.md` | Previews the named file |
-| `tools\preview-github.bat /offline` | Renders locally, with no network call |
-| `tools\preview-github.bat /nopause` | No key press prompt and no browser window, for scripts |
+| `tools\github_preview.bat doc.md` | Previews the named file |
+| `tools\github_preview.bat /offline` | Renders locally, with no network call |
+| `tools\github_preview.bat /nopause` | No key press prompt and no browser window, for scripts |
 
 It exits `0` on success and `1` on failure, so it is safe to call from other scripts.
 
@@ -88,7 +88,7 @@ bash tools/setup.sh
 Then render:
 
 ```bash
-tools/.venv/Scripts/python.exe tools/github_preview.py github-ssh-setup.md
+tools/.venv/Scripts/python.exe tools/github_preview.py docs/github-ssh-setup.md
 ```
 
 ### 3.2 PowerShell
@@ -102,7 +102,7 @@ Create the environment:
 Then render:
 
 ```powershell
-.\tools\.venv\Scripts\python.exe tools\github_preview.py github-ssh-setup.md
+.\tools\.venv\Scripts\python.exe tools\github_preview.py docs\github-ssh-setup.md
 ```
 
 ### 3.3 macOS and Linux
@@ -116,10 +116,10 @@ bash tools/setup.sh
 Then render:
 
 ```bash
-tools/.venv/bin/python tools/github_preview.py github-ssh-setup.md
+tools/.venv/bin/python tools/github_preview.py docs/github-ssh-setup.md
 ```
 
-The preview lands in `tools/out/github-ssh-setup.github.html`.
+The preview lands beside its source, at `docs/github-ssh-setup.html`.
 
 ---
 
@@ -147,7 +147,7 @@ The copy button uses the asynchronous clipboard API where it is available and fa
 GitHub shows an outline behind the hamburger icon at the top right of a rendered `.md` file, but it is hidden behind a click. `update_toc.py` writes a real one into the file, between `<!-- toc -->` markers so rerunning it replaces the block rather than stacking copies.
 
 ```bash
-tools/.venv/Scripts/python.exe tools/update_toc.py github-ssh-setup.md
+tools/.venv/Scripts/python.exe tools/lint/update_toc.py docs/github-ssh-setup.md
 ```
 
 Two flags are worth knowing:
@@ -164,13 +164,13 @@ Anchors follow GitHub's slug rule, and `github_preview.py` adds matching `id` at
 A runbook written on one machine is read on many, and personal detail leaks in through example commands almost by accident. Git history is permanent, so catching it before the first commit is much cheaper than catching it after.
 
 ```bash
-tools/.venv/Scripts/python.exe tools/scrub_pii.py github-ssh-setup.md --check
+tools/.venv/Scripts/python.exe tools/lint/scrub_pii.py docs/github-ssh-setup.md --check
 ```
 
 The script splits findings into two categories, because they need different handling:
 
 1. **Replaced automatically.** Email addresses become `<email>`, the username inside a home directory path becomes `<username>`, machine names become `<hostname>`. Addresses belonging to a service rather than a person are left alone, so `git@github.com` survives.
-2. **Reported for a human decision, never changed.** Key fingerprints, public key blobs, tokens and IP addresses. This matters: `github-ssh-setup.md` quotes GitHub's three published host key fingerprints, and scrubbing those would break its verification step. A token is a live secret, and the right response is revoking it, not hiding it.
+2. **Reported for a human decision, never changed.** Key fingerprints, public key blobs, tokens and IP addresses. This matters: `docs/github-ssh-setup.md` quotes GitHub's three published host key fingerprints, and scrubbing those would break its verification step. A token is a live secret, and the right response is revoking it, not hiding it.
 
 Three flags control it:
 
@@ -189,7 +189,7 @@ Both of these look fine while you read the `.md` file and are obvious on the ren
 A heading followed straight into a fenced command names the step without saying what the command does or what the reader should see afterwards.
 
 ```bash
-tools/.venv/Scripts/python.exe tools/check_intros.py github-ssh-setup.md
+tools/.venv/Scripts/python.exe tools/lint/check_intros.py docs/github-ssh-setup.md
 ```
 
 It reports every fenced block and table whose preceding line is a heading, a horizontal rule, another fence or a table row, and exits 1 if it finds any. Prose, a list item or a bold `**Run from:**` line all count as a proper introduction.
@@ -199,7 +199,7 @@ It reports every fenced block and table whose preceding line is a heading, a hor
 GitHub Flavored Markdown turns a single newline inside a paragraph into a `<br>`. Prose wrapped at 100 columns in an editor therefore renders with ragged breaks mid sentence, at the author's width rather than the reader's.
 
 ```bash
-tools/.venv/Scripts/python.exe tools/reflow_prose.py github-ssh-setup.md --check
+tools/.venv/Scripts/python.exe tools/lint/reflow_prose.py docs/github-ssh-setup.md --check
 ```
 
 Drop `--check` to join them into one source line per paragraph. Fenced code blocks, tables, headings, rules and Markdown's deliberate hard break syntax (two trailing spaces, or a backslash) are all left alone.
@@ -218,15 +218,15 @@ Every option, with the value used when you leave it out:
 
 | Option | Default | Meaning |
 | :--- | :--- | :--- |
-| `inputs` | every `.md` in the repository root | Markdown files to render |
-| `-o`, `--out-dir` | `tools/out` | Where the HTML is written |
+| `inputs` | every `.md` in `docs/` | Markdown files to render |
+| `-o`, `--out-dir` | beside the Markdown | Where the HTML is written |
 | `--offline` | off | Render locally, with no network call |
 | `--context` | none | Repository for resolving `#123` and `@user` links, as `<owner>/<repo>` |
 | `--no-open` | off | Do not open the preview in a browser |
 
 ### 8.1 Examples
 
-Render every Markdown file in the repository root:
+Render every Markdown file in `docs/`:
 
 ```bash
 tools/.venv/Scripts/python.exe tools/github_preview.py
@@ -235,13 +235,13 @@ tools/.venv/Scripts/python.exe tools/github_preview.py
 Render one file without sending it anywhere:
 
 ```bash
-tools/.venv/Scripts/python.exe tools/github_preview.py github-ssh-setup.md --offline
+tools/.venv/Scripts/python.exe tools/github_preview.py docs/github-ssh-setup.md --offline
 ```
 
 Render into a chosen directory without opening a browser, which is the form to use from a script:
 
 ```bash
-tools/.venv/Scripts/python.exe tools/github_preview.py github-ssh-setup.md -o build --no-open
+tools/.venv/Scripts/python.exe tools/github_preview.py docs/github-ssh-setup.md -o build --no-open
 ```
 
 ---
@@ -259,10 +259,10 @@ Find the symptom in the first column, then apply the fix:
 | Contents links go nowhere in the preview | Stale contents block | Run `update_toc.py`, which is also what `--check` reports |
 | The copy button does nothing | The page is open from a `file://` path in a browser that restricts the clipboard API | The textarea fallback covers most cases. Serve the file over `http://localhost` if a browser refuses both |
 | Environment is in a bad state | Partial or interrupted install | Delete `tools\.venv` and run the batch file again, or `bash tools/setup.sh --force` |
-| `execution of scripts is disabled` in PowerShell | Execution policy blocks `setup.ps1` | Use `preview-github.bat` instead, or run once: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` |
+| `execution of scripts is disabled` in PowerShell | Execution policy blocks `setup.ps1` | Use `github_preview.bat` instead, or run once: `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass` |
 
 ---
 
 ## 10. Verified result
 
-`github-ssh-setup.md` renders to a single self contained HTML file of roughly 91 KB, with GitHub's stylesheet inlined, no external assets, heading anchors that match the generated contents block, and a copy button on each of its 87 code blocks. It opens correctly from a local file path with no network access.
+`docs/github-ssh-setup.md` renders to a single self contained HTML file of roughly 91 KB, with GitHub's stylesheet inlined, no external assets, heading anchors that match the generated contents block, and a copy button on each of its 87 code blocks. It opens correctly from a local file path with no network access.

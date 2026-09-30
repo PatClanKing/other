@@ -5,7 +5,7 @@
 #
 # Afterwards:
 #   .\tools\.venv\Scripts\Activate.ps1
-#   python tools\github_preview.py github-ssh-setup.md
+#   python tools\github_preview.py docs\github-ssh-setup.md
 
 [CmdletBinding()]
 param(
@@ -54,4 +54,4 @@ if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed.' }
 Write-Host ''
 Write-Host 'Done. Next steps:'
 Write-Host '  .\tools\.venv\Scripts\Activate.ps1'
-Write-Host '  python tools\github_preview.py github-ssh-setup.md'
+Write-Host '  python tools\github_preview.py docs\github-ssh-setup.md'

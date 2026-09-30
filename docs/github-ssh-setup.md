@@ -121,7 +121,7 @@ Make the `ssh-agent` survive new Git Bash windows with the `~/.bashrc` block in 
 
 Before the steps, here is what you are building. Every box below is something these eleven steps create, configure or check, and the arrows are what talks to what:
 
-![Block diagram of the SSH authentication chain, from a git push on your machine through to the repository on GitHub](diagrams/ssh-auth-flow.drawio.svg)
+![Block diagram of the SSH authentication chain, from a git push on your machine through to the repository on GitHub](figures/ssh-auth-flow.drawio.svg)
 
 **Figure 1.** How Git, `ssh`, the `ssh-agent`, your two key halves and GitHub fit together. The one thing to take from it is that the private key never leaves the machine: `ssh` proves you hold it by having the `ssh-agent` sign a challenge with it.
 

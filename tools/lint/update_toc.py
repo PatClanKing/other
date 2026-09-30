@@ -17,8 +17,8 @@ If the markers are absent, they are inserted after the document's opening block 
 first `---` horizontal rule following the title), which is where a reader expects them.
 
 Usage:
-    python tools/update_toc.py github-ssh-setup.md
-    python tools/update_toc.py github-ssh-setup.md --depth 2
+    python tools/lint/update_toc.py docs/github-ssh-setup.md
+    python tools/lint/update_toc.py docs/github-ssh-setup.md --depth 2
     python tools/update_toc.py *.md --check
 """
 

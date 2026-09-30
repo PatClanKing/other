@@ -1403,7 +1403,7 @@ body {
 <hr />
 <h2 id="3-the-full-procedure">3. The full procedure</h2>
 <p>Before the steps, here is what you are building. Every box below is something these eleven steps create, configure or check, and the arrows are what talks to what:</p>
-<p><img alt="Block diagram of the SSH authentication chain, from a git push on your machine through to the repository on GitHub" src="diagrams/ssh-auth-flow.drawio.svg" /></p>
+<p><img alt="Block diagram of the SSH authentication chain, from a git push on your machine through to the repository on GitHub" src="figures/ssh-auth-flow.drawio.svg" /></p>
 <p><strong>Figure 1.</strong> How Git, <code>ssh</code>, the <code>ssh-agent</code>, your two key halves and GitHub fit together. The one thing to take from it is that the private key never leaves the machine: <code>ssh</code> proves you hold it by having the <code>ssh-agent</code> sign a challenge with it.</p>
 <p>Eleven steps, in order. Each step is numbered so you can jump straight back to it: step 4 is <a href="#34-get-the-ssh-agent-running">section 3.4</a>, and its sub steps are 3.4.1 onward. If you followed the quick path above and it worked, you only need the steps that failed.</p>
 <hr />

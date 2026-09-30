@@ -20,8 +20,8 @@ quotes, and leaving everything that depends on its own line alone:
   4. Deliberate hard breaks, which in Markdown are two trailing spaces or a backslash.
 
 Usage:
-    python tools/reflow_prose.py github-ssh-setup.md --check
-    python tools/reflow_prose.py github-ssh-setup.md
+    python tools/lint/reflow_prose.py docs/github-ssh-setup.md --check
+    python tools/lint/reflow_prose.py docs/github-ssh-setup.md
 """
 
 from __future__ import annotations

@@ -19,9 +19,9 @@ The result is wrapped in GitHub's own stylesheet (tools/assets/github-markdown.c
 which is vendored locally, so previewing works offline once generated.
 
 Usage:
-    python tools/github_preview.py github-ssh-setup.md
-    python tools/github_preview.py github-ssh-setup.md --offline
-    python tools/github_preview.py *.md --no-open
+    python tools/github_preview.py docs/github-ssh-setup.md
+    python tools/github_preview.py docs/github-ssh-setup.md --offline
+    python tools/github_preview.py docs/*.md --no-open
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO_ROOT = HERE.parent
 GITHUB_CSS = HERE / "assets" / "github-markdown.css"
-DEFAULT_OUT_DIR = HERE / "out"
+DOCS_DIR = REPO_ROOT / "docs"
 
 API_URL = "https://api.github.com/markdown"
 
@@ -327,12 +327,12 @@ def parse_args(argv=None) -> argparse.Namespace:
     parser.add_argument(
         "inputs",
         nargs="*",
-        help="Markdown files. Defaults to every .md file in the repository root.",
+        help="Markdown files. Defaults to every .md file in docs/.",
     )
     parser.add_argument(
         "-o", "--out-dir",
-        default=str(DEFAULT_OUT_DIR),
-        help="Where the HTML preview is written (default: tools/out).",
+        default="",
+        help="Where the HTML is written. Defaults to beside the Markdown file.",
     )
     parser.add_argument(
         "--offline",
@@ -357,12 +357,9 @@ def main(argv=None) -> int:
     if args.inputs:
         paths = [Path(p) for p in args.inputs]
     else:
-        paths = sorted(REPO_ROOT.glob("*.md"))
+        paths = sorted(DOCS_DIR.glob("*.md"))
         if not paths:
-            sys.exit("No Markdown files given and none found in the repository root.")
-
-    out_dir = Path(args.out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
+            sys.exit("No Markdown files given and none found in %s." % DOCS_DIR)
 
     failures = 0
     first_page = None
@@ -374,7 +371,12 @@ def main(argv=None) -> int:
             continue
 
         html, mode = build_page(md_path, args)
-        html_path = out_dir / (md_path.stem + ".github.html")
+        # Written beside its source unless told otherwise, because the page references
+        # its figures by a path relative to the Markdown. Putting the HTML anywhere else
+        # silently breaks every image in it.
+        out_dir = Path(args.out_dir) if args.out_dir else md_path.resolve().parent
+        out_dir.mkdir(parents=True, exist_ok=True)
+        html_path = out_dir / (md_path.stem + ".html")
         html_path.write_text(html, encoding="utf-8")
         print("wrote  %s  (%.1f KB, mode=%s)" % (html_path, html_path.stat().st_size / 1024, mode))
         if first_page is None:

@@ -1,12 +1,12 @@
-# Scratch output from the scripts in tools/. The one generated file that IS tracked
-# is github-ssh-setup.github.html in the repository root: it is the form of the
-# document people read, so it is committed alongside the Markdown it comes from.
+# Scratch output from the scripts in tools/. The rendered HTML in docs/ is NOT
+# ignored: it is the form of the document people read, so it is committed alongside
+# the Markdown it comes from.
 
-# Default output directory for github_preview.py, at any depth. Previews written
-# here are throwaway, unlike the tracked copy in the repository root.
+# Scratch output directory, at any depth. github_preview.py writes beside its source
+# by default, so anything landing here was sent there deliberately and is throwaway.
 out/
 
-# Python virtual environments created by setup.sh, setup.ps1 and preview-github.bat.
+# Python virtual environments created by setup.sh, setup.ps1 and github_preview.bat.
 .venv/
 venv/
 

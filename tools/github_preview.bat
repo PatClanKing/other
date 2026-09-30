@@ -1,12 +1,12 @@
 @echo off
 rem ===========================================================================
-rem  preview-github.bat  See a Markdown file exactly as GitHub will render it.
+rem  github_preview.bat  See a Markdown file exactly as GitHub will render it.
 rem
 rem  Ways to use it:
-rem    1. Double click it in Explorer.        Previews every .md in the repo root.
+rem    1. Double click it in Explorer.        Previews every .md in docs\.
 rem    2. Drag .md files onto it.             Previews just those files.
-rem    3. Run it from a terminal.             tools\preview-github.bat doc.md
-rem    4. Offline, no network call.           tools\preview-github.bat /offline
+rem    3. Run it from a terminal.             tools\github_preview.bat doc.md
+rem    4. Offline, no network call.           tools\github_preview.bat /offline
 rem
 rem  The preview opens in your default browser. It uses GitHub's own renderer,
 rem  so task lists, tables, autolinks and syntax colours match github.com.

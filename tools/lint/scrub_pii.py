@@ -21,8 +21,8 @@ Anything belonging to a service rather than a person is left alone, which is why
 `git@github.com` survives while `you@example.org` does not.
 
 Usage:
-    python tools/scrub_pii.py github-ssh-setup.md --check
-    python tools/scrub_pii.py github-ssh-setup.md
+    python tools/lint/scrub_pii.py docs/github-ssh-setup.md --check
+    python tools/lint/scrub_pii.py docs/github-ssh-setup.md
     python tools/scrub_pii.py *.md --extra "AcmeCorp=<company>"
 """
 

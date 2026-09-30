@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """How Git, ssh, ~/.ssh/config, ssh-agent and the keys fit together.
 
-Companion diagram for github-ssh-setup.md. Run with:
+Companion diagram for docs/github-ssh-setup.md. Run with:
 
     umldrawer build ssh-auth-flow.py
 

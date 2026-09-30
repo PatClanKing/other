@@ -8,7 +8,7 @@
 # Afterwards:
 #   source tools/.venv/Scripts/activate   # Git Bash on Windows
 #   source tools/.venv/bin/activate       # macOS and Linux
-#   python tools/github_preview.py github-ssh-setup.md
+#   python tools/github_preview.py docs/github-ssh-setup.md
 
 set -euo pipefail
 
@@ -74,4 +74,4 @@ if [ -x "$VENV_DIR/Scripts/python.exe" ]; then
 else
     echo "  source tools/.venv/bin/activate"
 fi
-echo "  python tools/github_preview.py github-ssh-setup.md"
+echo "  python tools/github_preview.py docs/github-ssh-setup.md"

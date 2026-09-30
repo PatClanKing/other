@@ -4,38 +4,54 @@ Guidance for working in this repository.
 
 ## Always regenerate the HTML with the Markdown
 
-`github-ssh-setup.github.html` in the repository root is a generated artifact, and it is the form of the document that actually gets read. It is **not** updated automatically.
+`docs/github-ssh-setup.html` is a generated artifact, and it is the form of the document that actually gets read. It is **not** updated automatically.
 
 Whenever you change `github-ssh-setup.md`, regenerate the HTML in the same turn, before reporting the work as done:
 
 ```bash
-tools/.venv/bin/python tools/github_preview.py github-ssh-setup.md --offline -o .
+tools/.venv/bin/python tools/github_preview.py docs/github-ssh-setup.md --offline
 ```
 
-Never hand back a change to the Markdown without the matching HTML. Treat the two as one deliverable, and commit them together: the HTML is tracked, so a commit touching only the Markdown leaves the published document stale. The same applies to any other `.md` file that has a generated `.github.html` beside it.
+Never hand back a change to the Markdown without the matching HTML. Treat the two as one deliverable, and commit them together: the HTML is tracked, so a commit touching only the Markdown leaves the published document stale. The same applies to any other document in `docs/`.
 
-Previews written into `tools/out/` stay ignored, because those are throwaway. Only the copy in the repository root is tracked.
+The HTML is written beside its Markdown by default, because the page references its figures by a path relative to the Markdown. Sending it anywhere else silently breaks every image in it.
 
 On Windows the interpreter is `tools/.venv/Scripts/python.exe`. If `tools/.venv` does not exist, create it with `bash tools/setup.sh` first.
+
+## Figures
+
+A figure's source of truth is its Python script in `docs/figures/`, never the `.drawio` file. Opening a generated `.drawio` in the draw.io GUI and nudging a box is lost on the next build. Rebuild with the `umldrawer` skill, from inside `docs/figures`:
+
+```bash
+umldrawer build ssh-auth-flow.py
+```
+
+```bash
+umldrawer png ssh-auth-flow.drawio.svg 1800
+```
+
+That second command writes `ssh-auth-flow.preview.png`, so rename it to `ssh-auth-flow.png` to match what the repository uses. Always look at the render before believing it: neither router avoids obstacles, so a line straight through a box passes every automated check.
+
+The document references the `.drawio.svg`, not the `.png`, because that file is a picture carrying its own editable source and the two therefore cannot drift apart.
 
 ## Before saying a document change is finished
 
 Run all four linters. They are the gate, and a failure is a defect until you have read it and decided otherwise:
 
 ```bash
-tools/.venv/bin/python tools/update_toc.py github-ssh-setup.md
+tools/.venv/bin/python tools/lint/update_toc.py docs/github-ssh-setup.md
 ```
 
 ```bash
-tools/.venv/bin/python tools/check_intros.py github-ssh-setup.md
+tools/.venv/bin/python tools/lint/check_intros.py docs/github-ssh-setup.md
 ```
 
 ```bash
-tools/.venv/bin/python tools/reflow_prose.py github-ssh-setup.md --check
+tools/.venv/bin/python tools/lint/reflow_prose.py docs/github-ssh-setup.md --check
 ```
 
 ```bash
-tools/.venv/bin/python tools/scrub_pii.py github-ssh-setup.md --check
+tools/.venv/bin/python tools/lint/scrub_pii.py docs/github-ssh-setup.md --check
 ```
 
 Regenerate the contents block after any structural edit rather than editing it by hand, and check that every `](#anchor)` link still resolves to a heading. Changing a heading changes its anchor, so links and the contents block both have to be rebuilt.
@@ -53,7 +69,7 @@ The full style is in the `technical-runbook` skill. The rules that get broken mo
 
 ## Scope of the runbook
 
-`github-ssh-setup.md` targets Git Bash on Windows. Do not add macOS or Linux variants of commands; the opening paragraph states the scope deliberately. Windows specific tooling such as `clip.exe`, `winpty`, `MSYS_NO_PATHCONV` and `/c/...` drive paths is expected and correct.
+`docs/github-ssh-setup.md` targets Git Bash on Windows. Do not add macOS or Linux variants of commands; the opening paragraph states the scope deliberately. Windows specific tooling such as `clip.exe`, `winpty`, `MSYS_NO_PATHCONV` and `/c/...` drive paths is expected and correct.
 
 Refer to the OpenSSH agent as `ssh-agent` in a code span, not as "the agent". The exception is a password manager's own SSH agent, such as 1Password or Bitwarden, which is a different thing.
 

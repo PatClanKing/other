@@ -13,7 +13,7 @@ list item, a bold `**Run from:**` annotation. It does not count when it is a hea
 horizontal rule, the end of another fence, the last row of a table, or the top of the file.
 
 Usage:
-    python tools/check_intros.py github-ssh-setup.md
+    python tools/lint/check_intros.py docs/github-ssh-setup.md
     python tools/check_intros.py *.md --quiet
 """
 
