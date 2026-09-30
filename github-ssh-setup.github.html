@@ -1326,39 +1326,40 @@ body {
 <!-- toc -->
 
 <h2 id="contents">Contents</h2>
-<ul>
-<li><a href="#1-git-bash-specifics-you-need-to-know-first">1. Git Bash specifics you need to know first</a></li>
-<li><a href="#2-quick-path-if-you-just-want-it-working">2. Quick path (if you just want it working)</a></li>
-<li><a href="#3-the-full-procedure">3. The full procedure</a></li>
-<li><a href="#31-see-what-you-already-have">3.1 See what you already have</a></li>
-<li><a href="#32-choose-a-key-type-ranked">3.2 Choose a key type (ranked)</a></li>
-<li><a href="#33-generate-the-key">3.3 Generate the key</a></li>
-<li><a href="#34-get-the-ssh-agent-running">3.4 Get the <code>ssh-agent</code> running</a></li>
-<li><a href="#35-load-the-key-into-the-ssh-agent">3.5 Load the key into the <code>ssh-agent</code></a></li>
-<li><a href="#36-verify-the-ssh-agent-and-the-loaded-keys">3.6 Verify the <code>ssh-agent</code> and the loaded keys</a></li>
-<li><a href="#37-register-the-public-key-with-github-ranked">3.7 Register the public key with GitHub (ranked)</a></li>
-<li><a href="#38-test-the-connection-to-github-manually">3.8 Test the connection to GitHub manually</a></li>
-<li><a href="#39-verify-you-are-talking-to-the-real-github">3.9 Verify you are talking to the real GitHub</a></li>
-<li><a href="#310-the-sshconfig-file">3.10 The <code>~/.ssh/config</code> file</a></li>
-<li><a href="#311-make-git-actually-use-the-key">3.11 Make Git actually use the key</a></li>
-<li><a href="#4-start-the-ssh-agent-automatically-in-every-git-bash-window">4. Start the <code>ssh-agent</code> automatically in every Git Bash window</a></li>
-<li><a href="#41-check-that-git-bash-reads-bashrc-at-startup">4.1 Check that Git Bash reads <code>~/.bashrc</code> at startup</a></li>
-<li><a href="#42-add-the-startup-block">4.2 Add the startup block</a></li>
-<li><a href="#43-apply-it-and-confirm-it-works">4.3 Apply it and confirm it works</a></li>
-<li><a href="#44-load-more-than-one-key">4.4 Load more than one key</a></li>
-<li><a href="#45-what-happens-when-a-key-has-a-passphrase">4.5 What happens when a key has a passphrase</a></li>
-<li><a href="#46-what-to-expect-and-how-to-undo-it">4.6 What to expect, and how to undo it</a></li>
-<li><a href="#5-multiple-github-accounts-or-keys">5. Multiple GitHub accounts or keys</a></li>
-<li><a href="#6-optional-sign-commits-with-the-same-ssh-key">6. Optional: sign commits with the same SSH key</a></li>
-<li><a href="#7-file-permissions">7. File permissions</a></li>
-<li><a href="#8-troubleshooting-matrix">8. Troubleshooting matrix</a></li>
-<li><a href="#9-full-verification-checklist">9. Full verification checklist</a></li>
-<li><a href="#10-cheat-sheet">10. Cheat sheet</a></li>
-<li><a href="#11-terminology">11. Terminology</a></li>
-<li><a href="#12-references-every-link-checked-http-200">12. References (every link checked, HTTP 200)</a></li>
-</ul>
+<p><a href="#figures">Figures</a><br />
+<a href="#1-git-bash-specifics-you-need-to-know-first">1. Git Bash specifics you need to know first</a><br />
+<a href="#2-quick-path-if-you-just-want-it-working">2. Quick path (if you just want it working)</a><br />
+<a href="#3-the-full-procedure">3. The full procedure</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#31-see-what-you-already-have">3.1 See what you already have</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#32-choose-a-key-type-ranked">3.2 Choose a key type (ranked)</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#33-generate-the-key">3.3 Generate the key</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#34-get-the-ssh-agent-running">3.4 Get the <code>ssh-agent</code> running</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#35-load-the-key-into-the-ssh-agent">3.5 Load the key into the <code>ssh-agent</code></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#36-verify-the-ssh-agent-and-the-loaded-keys">3.6 Verify the <code>ssh-agent</code> and the loaded keys</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#37-register-the-public-key-with-github-ranked">3.7 Register the public key with GitHub (ranked)</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#38-test-the-connection-to-github-manually">3.8 Test the connection to GitHub manually</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#39-verify-you-are-talking-to-the-real-github">3.9 Verify you are talking to the real GitHub</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#310-the-sshconfig-file">3.10 The <code>~/.ssh/config</code> file</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#311-make-git-actually-use-the-key">3.11 Make Git actually use the key</a><br />
+<a href="#4-start-the-ssh-agent-automatically-in-every-git-bash-window">4. Start the <code>ssh-agent</code> automatically in every Git Bash window</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#41-check-that-git-bash-reads-bashrc-at-startup">4.1 Check that Git Bash reads <code>~/.bashrc</code> at startup</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#42-add-the-startup-block">4.2 Add the startup block</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#43-apply-it-and-confirm-it-works">4.3 Apply it and confirm it works</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#44-load-more-than-one-key">4.4 Load more than one key</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#45-what-happens-when-a-key-has-a-passphrase">4.5 What happens when a key has a passphrase</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="#46-what-to-expect-and-how-to-undo-it">4.6 What to expect, and how to undo it</a><br />
+<a href="#5-multiple-github-accounts-or-keys">5. Multiple GitHub accounts or keys</a><br />
+<a href="#6-optional-sign-commits-with-the-same-ssh-key">6. Optional: sign commits with the same SSH key</a><br />
+<a href="#7-file-permissions">7. File permissions</a><br />
+<a href="#8-troubleshooting-matrix">8. Troubleshooting matrix</a><br />
+<a href="#9-full-verification-checklist">9. Full verification checklist</a><br />
+<a href="#10-cheat-sheet">10. Cheat sheet</a><br />
+<a href="#11-terminology">11. Terminology</a><br />
+<a href="#12-references-every-link-checked-http-200">12. References (every link checked, HTTP 200)</a></p>
 <!-- /toc -->
 
+<h2 id="figures">Figures</h2>
+<p><a href="#3-the-full-procedure">Figure 1. How Git, <code>ssh</code>, the <code>ssh-agent</code>, your two key halves and GitHub fit together</a></p>
 <hr />
 <h2 id="1-git-bash-specifics-you-need-to-know-first">1. Git Bash specifics you need to know first</h2>
 <ol>
@@ -1401,6 +1402,9 @@ body {
 <p>Make the <code>ssh-agent</code> survive new Git Bash windows with the <code>~/.bashrc</code> block in <a href="#4-start-the-ssh-agent-automatically-in-every-git-bash-window">section 4</a>. The rest of this document explains each step and every verification command.</p>
 <hr />
 <h2 id="3-the-full-procedure">3. The full procedure</h2>
+<p>Before the steps, here is what you are building. Every box below is something these eleven steps create, configure or check, and the arrows are what talks to what:</p>
+<p><img alt="Block diagram of the SSH authentication chain, from a git push on your machine through to the repository on GitHub" src="diagrams/ssh-auth-flow.drawio.svg" /></p>
+<p><strong>Figure 1.</strong> How Git, <code>ssh</code>, the <code>ssh-agent</code>, your two key halves and GitHub fit together. The one thing to take from it is that the private key never leaves the machine: <code>ssh</code> proves you hold it by having the <code>ssh-agent</code> sign a challenge with it.</p>
 <p>Eleven steps, in order. Each step is numbered so you can jump straight back to it: step 4 is <a href="#34-get-the-ssh-agent-running">section 3.4</a>, and its sub steps are 3.4.1 onward. If you followed the quick path above and it worked, you only need the steps that failed.</p>
 <hr />
 <h3 id="31-see-what-you-already-have">3.1 See what you already have</h3>
