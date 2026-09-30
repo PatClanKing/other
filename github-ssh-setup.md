@@ -1,6 +1,6 @@
 # GitHub SSH Setup, Start to Finish (Git Bash)
 
-Practical runbook for creating an SSH (Secure Shell) key, loading it into the SSH agent, registering it with GitHub, and proving the whole chain works.
+Practical runbook for creating an SSH (Secure Shell) key, loading it into the `ssh-agent`, registering it with GitHub, and proving the whole chain works.
 
 Everything here targets Git Bash on Windows and assumes you are typing into it. Most of the commands are plain POSIX (Portable Operating System Interface) shell and would carry over to macOS or Linux unchanged, but this document does not cover those platforms, because the parts that make it work are Windows specific: `clip.exe`, `winpty`, `MSYS_NO_PATHCONV` and `/c/...` drive paths.
 
@@ -19,21 +19,28 @@ Every command is copy pasteable.
   * [3.2 Choose a key type (ranked)](#32-choose-a-key-type-ranked)
   * [3.3 Generate the key](#33-generate-the-key)
   * [3.4 Get the `ssh-agent` running](#34-get-the-ssh-agent-running)
-  * [3.5 Load the key into the agent](#35-load-the-key-into-the-agent)
-  * [3.6 Verify the agent and the loaded keys](#36-verify-the-agent-and-the-loaded-keys)
+  * [3.5 Load the key into the `ssh-agent`](#35-load-the-key-into-the-ssh-agent)
+  * [3.6 Verify the `ssh-agent` and the loaded keys](#36-verify-the-ssh-agent-and-the-loaded-keys)
   * [3.7 Register the public key with GitHub (ranked)](#37-register-the-public-key-with-github-ranked)
   * [3.8 Test the connection to GitHub manually](#38-test-the-connection-to-github-manually)
   * [3.9 Verify you are talking to the real GitHub](#39-verify-you-are-talking-to-the-real-github)
   * [3.10 The `~/.ssh/config` file](#310-the-sshconfig-file)
   * [3.11 Make Git actually use the key](#311-make-git-actually-use-the-key)
-* [4. Multiple GitHub accounts or keys](#4-multiple-github-accounts-or-keys)
-* [5. Optional: sign commits with the same SSH key](#5-optional-sign-commits-with-the-same-ssh-key)
-* [6. File permissions](#6-file-permissions)
-* [7. Troubleshooting matrix](#7-troubleshooting-matrix)
-* [8. Full verification checklist](#8-full-verification-checklist)
-* [9. Cheat sheet](#9-cheat-sheet)
-* [10. Terminology](#10-terminology)
-* [11. References (every link checked, HTTP 200)](#11-references-every-link-checked-http-200)
+* [4. Start the `ssh-agent` automatically in every Git Bash window](#4-start-the-ssh-agent-automatically-in-every-git-bash-window)
+  * [4.1 Check that Git Bash reads `~/.bashrc` at startup](#41-check-that-git-bash-reads-bashrc-at-startup)
+  * [4.2 Add the startup block](#42-add-the-startup-block)
+  * [4.3 Apply it and confirm it works](#43-apply-it-and-confirm-it-works)
+  * [4.4 Load more than one key](#44-load-more-than-one-key)
+  * [4.5 What happens when a key has a passphrase](#45-what-happens-when-a-key-has-a-passphrase)
+  * [4.6 What to expect, and how to undo it](#46-what-to-expect-and-how-to-undo-it)
+* [5. Multiple GitHub accounts or keys](#5-multiple-github-accounts-or-keys)
+* [6. Optional: sign commits with the same SSH key](#6-optional-sign-commits-with-the-same-ssh-key)
+* [7. File permissions](#7-file-permissions)
+* [8. Troubleshooting matrix](#8-troubleshooting-matrix)
+* [9. Full verification checklist](#9-full-verification-checklist)
+* [10. Cheat sheet](#10-cheat-sheet)
+* [11. Terminology](#11-terminology)
+* [12. References (every link checked, HTTP 200)](#12-references-every-link-checked-http-200)
 
 <!-- /toc -->
 
@@ -45,7 +52,7 @@ Every command is copy pasteable.
    ```bash
    echo "$HOME" && pwd
    ```
-2. Git Bash ships its own OpenSSH at `/usr/bin/ssh`, and Git calls it by default. Leave `core.sshCommand` unset so `git`, `ssh` and `ssh-add` all use that one client and therefore one agent. Verify with:
+2. Git Bash ships its own OpenSSH at `/usr/bin/ssh`, and Git calls it by default. Leave `core.sshCommand` unset so `git`, `ssh` and `ssh-add` all use that one client and therefore one `ssh-agent`. Verify with:
    ```bash
    which -a ssh && git config --global --get core.sshCommand
    ```
@@ -53,7 +60,7 @@ Every command is copy pasteable.
 3. Drive letters are mounted under a single slash, so a folder like `C:\git\<repo>` is `/c/git/<repo>`.
 4. Paths starting with `/` are sometimes rewritten by MSYS2 (the Unix compatibility layer Git Bash is built on). If an argument gets mangled, prefix the command with `MSYS_NO_PATHCONV=1`.
 5. If an interactive prompt hangs or you see `the input device is not a TTY`, prefix the command with `winpty`, for example `winpty ssh -T git@github.com`.
-6. `clip.exe` is the clipboard helper Git Bash gives you, used in section 3.7.
+6. `clip.exe` is the clipboard helper Git Bash gives you, used in [section 3.7](#37-register-the-public-key-with-github-ranked).
 7. **Every step below that runs a command starts with a "Run from" line** telling you which directory to be in. Most steps work from anywhere because the paths are absolute, but the Git steps genuinely need you to be inside a repository. Check where you are at any time:
    ```bash
    pwd
@@ -75,7 +82,7 @@ Generate the key pair:
 ssh-keygen -t ed25519 -C "<email>" -f ~/.ssh/id_ed25519
 ```
 
-Start an agent in this shell:
+Start an `ssh-agent` in this shell:
 
 ```bash
 eval "$(ssh-agent -s)"
@@ -101,13 +108,13 @@ ssh -T git@github.com
 
 Expected: `Hi <username>! You've successfully authenticated, but GitHub does not provide shell access.`
 
-Make the agent survive new Git Bash windows with the `~/.bashrc` block in section 3.4.2. The rest of this document explains each step and every verification command.
+Make the `ssh-agent` survive new Git Bash windows with the `~/.bashrc` block in [section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window). The rest of this document explains each step and every verification command.
 
 ---
 
 ## 3. The full procedure
 
-Eleven steps, in order. Each step is numbered so you can jump straight back to it: step 4 is section 3.4, and its sub steps are 3.4.1 onward. If you followed the quick path above and it worked, you only need the steps that failed.
+Eleven steps, in order. Each step is numbered so you can jump straight back to it: step 4 is [section 3.4](#34-get-the-ssh-agent-running), and its sub steps are 3.4.1 onward. If you followed the quick path above and it worked, you only need the steps that failed.
 
 ---
 
@@ -135,7 +142,7 @@ Then check the version of the one that wins:
 ssh -V
 ```
 
-1. Confirm the winner is `/usr/bin/ssh`, the Git Bash OpenSSH, which is the assumption of this whole guide. Windows ships a second OpenSSH under `/c/Windows/System32/OpenSSH`, and that one keeps its own separate agent, so a key loaded here is invisible to it.
+1. Confirm the winner is `/usr/bin/ssh`, the Git Bash OpenSSH, which is the assumption of this whole guide. Windows ships a second OpenSSH under `/c/Windows/System32/OpenSSH`, and that one keeps its own separate `ssh-agent`, so a key loaded here is invisible to it.
 2. Check which client Git itself will call:
    ```bash
    git config --global --get core.sshCommand
@@ -206,7 +213,7 @@ ssh-keygen -t ed25519 -C "<email>" -f ~/.ssh/id_ed25519
 1. `-t` = key type.
 2. `-C` = comment, conventionally your email. Purely a label to help you identify the key later.
 3. `-f` = output file. Naming per purpose (for example `~/.ssh/id_ed25519_work`) keeps multi account setups sane.
-4. You are prompted for a passphrase. **Use one.** The agent means you only type it once per session.
+4. You are prompted for a passphrase. **Use one.** The `ssh-agent` means you only type it once per session.
 
 #### 3.3.2 RSA fallback
 
@@ -254,58 +261,23 @@ ssh-keygen -y -f ~/.ssh/id_ed25519 > ~/.ssh/id_ed25519.pub
 
 ### 3.4 Get the `ssh-agent` running
 
-**Run from:** anywhere, `cd ~` is a fine default. An agent belongs to a shell session, not to a directory, so your current location has no effect on it.
+**Run from:** anywhere, `cd ~` is a fine default. An `ssh-agent` belongs to a shell session, not to a directory, so your current location has no effect on it.
 
 #### 3.4.1 Options (ranked)
 
-Three ways to have an agent available when you need one:
+Three ways to have an `ssh-agent` available when you need one:
 
 | Rank | Option | Best for | Trade off | Set up in |
 |------|--------|----------|-----------|-----------|
-| 1 | **Agent auto started from `~/.bashrc`** | Everyday use | Passphrase once per reboot, and every Git Bash window shares the one agent | Section 3.4.2 |
+| 1 | **`ssh-agent` auto started from `~/.bashrc`** | Everyday use | Passphrase once per reboot, and every Git Bash window shares the one `ssh-agent` | [Section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) |
 | 2 | **1Password or Bitwarden SSH agent** | Teams already using that password manager | Biometric unlock instead of a passphrase, but adds a dependency and an `IdentityAgent` line in `~/.ssh/config` | Not covered here, follow the vendor documentation |
-| 3 | **`eval "$(ssh-agent -s)"` typed per shell** | One off work, CI (Continuous Integration) | Dies with the shell, and each new window starts a fresh empty agent | Section 3.4.3 |
+| 3 | **`eval "$(ssh-agent -s)"` typed per shell** | One off work, CI (Continuous Integration) | Dies with the shell, and each new window starts a fresh empty `ssh-agent` | [Section 3.4.2](#342-start-an-ssh-agent-for-this-shell) |
 
-Recommendation: **rank 1**. It is rank 3 plus five lines of `~/.bashrc`, and it removes the most common daily annoyance, which is a new terminal window that has forgotten your key. Rank 2 is the only one with no subsection below, because the setup belongs to the password manager rather than to Git Bash.
+Recommendation: **rank 1**. It is rank 3 plus a dozen lines of `~/.bashrc`, and it removes the most common daily annoyance, which is a new terminal window that has forgotten your key. Rank 2 is the only one with nothing written up here, because the setup belongs to the password manager rather than to Git Bash.
 
-#### 3.4.2 Start an agent now and keep it across windows
+#### 3.4.2 Start an `ssh-agent` for this shell
 
-Start it in the current shell:
-
-```bash
-eval "$(ssh-agent -s)"
-```
-
-Then append this block to `~/.bashrc` so every new Git Bash window reuses one agent instead of spawning a new one:
-
-```bash
-cat >> ~/.bashrc <<'EOF'
-
-# Reuse a single ssh-agent across Git Bash sessions
-SSH_ENV="$HOME/.ssh/agent.env"
-agent_load_env() { test -f "$SSH_ENV" && . "$SSH_ENV" >/dev/null; }
-agent_start() { (umask 077; ssh-agent >"$SSH_ENV"); . "$SSH_ENV" >/dev/null; }
-agent_load_env
-ssh-add -l >/dev/null 2>&1
-if [ $? -eq 2 ]; then agent_start; ssh-add ~/.ssh/id_ed25519; fi
-EOF
-```
-
-Apply it without opening a new window:
-
-```bash
-source ~/.bashrc
-```
-
-`~/.bashrc` is the file Git Bash reads. If you only have `~/.bash_profile`, make sure it sources `~/.bashrc`:
-
-```bash
-grep -q 'bashrc' ~/.bash_profile 2>/dev/null || echo '[ -f ~/.bashrc ] && . ~/.bashrc' >> ~/.bash_profile
-```
-
-#### 3.4.3 Start a throwaway agent for one shell
-
-Start an agent that lives only as long as this window. The `eval` matters: `ssh-agent -s` only prints the environment variables, so without it the agent starts but this shell never learns how to reach it.
+Start an `ssh-agent` that lives only as long as this window. The `eval` matters: `ssh-agent -s` only prints the environment variables, so without it the `ssh-agent` starts but this shell never learns how to reach it.
 
 ```bash
 eval "$(ssh-agent -s)"
@@ -317,9 +289,11 @@ Kill it when you are done:
 ssh-agent -k
 ```
 
+This is enough to finish the rest of [section 3](#3-the-full-procedure). It does not survive the window closing, so once the whole chain works, [section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) makes Git Bash start the `ssh-agent` and load your keys for you.
+
 ---
 
-### 3.5 Load the key into the agent
+### 3.5 Load the key into the `ssh-agent`
 
 **Run from:** anywhere. The key paths are absolute.
 
@@ -327,23 +301,23 @@ ssh-agent -k
 ssh-add ~/.ssh/id_ed25519
 ```
 
-Add with a lifetime, the agent forgets it after 8 hours:
+Add with a lifetime, the `ssh-agent` forgets it after 8 hours:
 
 ```bash
 ssh-add -t 8h ~/.ssh/id_ed25519
 ```
 
-Git Bash has no system keychain to hand the passphrase to, so the agent forgets the key when the machine restarts. The `~/.bashrc` block in section 3.4.2 is the Git Bash answer to that: it reloads the key into one shared agent on the first terminal you open, so you type the passphrase once per reboot rather than once per window.
+Git Bash has no system keychain to hand the passphrase to, so the `ssh-agent` forgets the key when the machine restarts. The `~/.bashrc` block in [section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) is the Git Bash answer to that: it reloads the key into one shared `ssh-agent` on the first terminal you open, so you type the passphrase once per reboot rather than once per window.
 
 ---
 
-### 3.6 Verify the agent and the loaded keys
+### 3.6 Verify the `ssh-agent` and the loaded keys
 
 **Run from:** anywhere. Nothing here touches the current directory.
 
 Four independent checks.
 
-#### 3.6.1 Is an agent running, and is *this* shell talking to it?
+#### 3.6.1 Is an `ssh-agent` running, and is *this* shell talking to it?
 
 These are two separate questions, and confusing them wastes a lot of time. First, is a process running anywhere on the machine?
 
@@ -358,9 +332,9 @@ echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK"
 echo "SSH_AGENT_PID=$SSH_AGENT_PID"
 ```
 
-An empty `SSH_AUTH_SOCK` means this shell is **not** talking to any agent, even if one is running in another window. That is the number one Git Bash gotcha, and section 3.4.2 fixes it permanently.
+An empty `SSH_AUTH_SOCK` means this shell is **not** talking to any `ssh-agent`, even if one is running in another window. That is the number one Git Bash gotcha, and [section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) fixes it permanently.
 
-#### 3.6.2 Which keys does the agent currently hold?
+#### 3.6.2 Which keys does the `ssh-agent` currently hold?
 
 Fingerprints only:
 
@@ -379,11 +353,11 @@ How to read the result:
 | Output | Meaning | Fix |
 |--------|---------|-----|
 | `256 SHA256:... comment (ED25519)` | Key is loaded and usable | Nothing to do |
-| `The agent has no identities.` | Agent runs, no key loaded | `ssh-add ~/.ssh/id_ed25519` |
-| `Could not open a connection to your authentication agent.` | No agent reachable from this shell | `eval "$(ssh-agent -s)"`, then section 3.4.2 |
-| `Error connecting to agent: No such file or directory` | Stale `SSH_AUTH_SOCK` pointing at a dead agent | `unset SSH_AUTH_SOCK` then start a fresh agent |
+| `The agent has no identities.` | `ssh-agent` runs, no key loaded | `ssh-add ~/.ssh/id_ed25519` |
+| `Could not open a connection to your authentication agent.` | No `ssh-agent` reachable from this shell | `eval "$(ssh-agent -s)"`, then [section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) |
+| `Error connecting to agent: No such file or directory` | Stale `SSH_AUTH_SOCK` pointing at a dead `ssh-agent` | `unset SSH_AUTH_SOCK` then start a fresh `ssh-agent` |
 
-Exit codes of `ssh-add -l`: **0** = keys present, **1** = agent reachable but empty, **2** = no agent reachable.
+Exit codes of `ssh-add -l`: **0** = keys present, **1** = `ssh-agent` reachable but empty, **2** = no `ssh-agent` reachable.
 
 ```bash
 ssh-add -l; echo "exit code: $?"
@@ -415,7 +389,7 @@ EOF
 
 Then run `sshcheck` any time you want the full picture.
 
-#### 3.6.3 Does the agent key match the key on disk and the key on GitHub?
+#### 3.6.3 Does the `ssh-agent` key match the key on disk and the key on GitHub?
 
 Print both fingerprints side by side so you can compare them in one glance rather than from memory:
 
@@ -425,15 +399,15 @@ ssh-add -l && ssh-keygen -l -f ~/.ssh/id_ed25519.pub
 
 Both must print the same `SHA256:...` value, and that value must appear next to the key listed at <https://github.com/settings/keys>.
 
-#### 3.6.4 Removing keys from the agent
+#### 3.6.4 Removing keys from the `ssh-agent`
 
-An agent holds a key until you remove it or the process dies, which matters when you are switching between accounts. To drop a single key:
+An `ssh-agent` holds a key until you remove it or the process dies, which matters when you are switching between accounts. To drop a single key:
 
 ```bash
 ssh-add -d ~/.ssh/id_ed25519
 ```
 
-To empty the agent completely:
+To empty the `ssh-agent` completely:
 
 ```bash
 ssh-add -D
@@ -441,7 +415,7 @@ ssh-add -D
 
 1. `-d` removes one key.
 2. `-D` removes every key.
-3. `ssh-add -x` and `ssh-add -X` lock and unlock the agent with a password.
+3. `ssh-add -x` and `ssh-add -X` lock and unlock the `ssh-agent` with a password.
 
 ---
 
@@ -474,7 +448,7 @@ Two ways to hand that key to GitHub, ranked:
 | 1 | GitHub CLI (Command Line Interface) | `gh ssh-key add ~/.ssh/id_ed25519.pub --title "gitbash-laptop"` | Fastest and scriptable, needs `gh auth login` first. Manual: <https://cli.github.com/manual/gh_ssh-key_add> |
 | 2 | Web interface | <https://github.com/settings/keys> then "New SSH key" | No extra tooling, and the only route on a machine without `gh` |
 
-Both routes register the key for **authentication**. Signing commits needs the same public key uploaded a second time as a separate signing key, which is section 5.
+Both routes register the key for **authentication**. Signing commits needs the same public key uploaded a second time as a separate signing key, which is [section 6](#6-optional-sign-commits-with-the-same-ssh-key).
 
 Concrete commands for rank 1. Authenticate `gh` first, which opens a browser and stores a token, so it is a one time step per machine:
 
@@ -498,7 +472,7 @@ gh ssh-key list
 
 ### 3.8 Test the connection to GitHub manually
 
-**Run from:** anywhere. Section 3.8.4 uses `git ls-remote` with a full remote address, so even that works outside a repository.
+**Run from:** anywhere. [Section 3.8.4](#384-test-the-real-git-path-end-to-end) uses `git ls-remote` with a full remote address, so even that works outside a repository.
 
 #### 3.8.1 The canonical test
 
@@ -524,9 +498,9 @@ Non interactive test that fails fast instead of prompting:
 ssh -o BatchMode=yes -T git@github.com
 ```
 
-#### 3.8.2 Test one specific key, ignoring the agent
+#### 3.8.2 Test one specific key, ignoring the `ssh-agent`
 
-When you hold several keys, this proves which one GitHub accepts rather than leaving it to whichever the agent happens to offer first:
+When you hold several keys, this proves which one GitHub accepts rather than leaving it to whichever the `ssh-agent` happens to offer first:
 
 ```bash
 ssh -T -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes git@github.com
@@ -658,17 +632,17 @@ The part worth being precise about is who actually reads it, because the name in
 |---------|------------------------|--------------|
 | `ssh` | **Yes** | The only program here that parses the file. `scp` and `sftp` inherit it because they run `ssh`. |
 | `ssh-agent` | **No** | It is a key store with no idea what a host is. It holds decrypted keys and answers requests from `ssh`. |
-| `ssh-add` | **No** | It talks to the agent over `SSH_AUTH_SOCK`. Its manual lists only the default key files, no config file. |
+| `ssh-add` | **No** | It talks to the `ssh-agent` over `SSH_AUTH_SOCK`. Its manual lists only the default key files, no config file. |
 | `git` | **Indirectly** | Git does not speak SSH itself, it runs `ssh`, so whatever the file says applies to `git push` too. |
 
-This explains a line that otherwise looks contradictory. `AddKeysToAgent yes` sits in the client config, yet the agent never reads it. What happens is that `ssh` reads the directive and then pushes the key into the agent on your behalf. Every interaction with the agent goes through `ssh`, never the other way round.
+This explains a line that otherwise looks contradictory. `AddKeysToAgent yes` sits in the client config, yet the `ssh-agent` never reads it. What happens is that `ssh` reads the directive and then pushes the key into the `ssh-agent` on your behalf. Every interaction with the `ssh-agent` goes through `ssh`, never the other way round.
 
 Two behaviours will eventually catch you out, so they are worth knowing now rather than debugging later:
 
 1. **First match wins, not last.** SSH takes its settings from the command line first, then this file, then `/etc/ssh/ssh_config`, and for any keyword the **first** value it obtains is the one used. This is the opposite of most configuration formats. A `Host *` block placed at the top of the file therefore silences every more specific block below it, so keep general blocks at the bottom.
 2. **Permissions are enforced.** The file must be readable and writable by you and not writable by anyone else, which is why `chmod 600` appears below. SSH refuses to use a config it considers too open.
 
-Full option reference, one entry per keyword: <https://man.openbsd.org/ssh_config.5>. The client that reads it is documented at <https://man.openbsd.org/ssh.1>, and the agent it hands keys to at <https://man.openbsd.org/ssh-agent.1>.
+Full option reference, one entry per keyword: <https://man.openbsd.org/ssh_config.5>. The client that reads it is documented at <https://man.openbsd.org/ssh.1>, and the `ssh-agent` it hands keys to at <https://man.openbsd.org/ssh-agent.1>.
 
 #### 3.10.2 Create the file
 
@@ -701,11 +675,11 @@ nano ~/.ssh/config
 What each line in that block is doing:
 
 1. `Host github.com` opens the block. Everything indented under it applies when the address you typed matches this pattern.
-2. `HostName github.com` is the address SSH actually connects to. It is the same here, but it is what makes host aliases possible in section 4.
+2. `HostName github.com` is the address SSH actually connects to. It is the same here, but it is what makes host aliases possible in [section 5](#5-multiple-github-accounts-or-keys).
 3. `User git` is the SSH username, which for GitHub is always the literal word `git`. Your GitHub account is identified by the key, not by this name.
 4. `IdentityFile` picks the key.
 5. `IdentitiesOnly yes` offers only that key, avoiding wrong account logins and `Too many authentication failures`.
-6. `AddKeysToAgent yes` loads the key into the agent on first use, so you stop running `ssh-add` by hand.
+6. `AddKeysToAgent yes` loads the key into the `ssh-agent` on first use, so you stop running `ssh-add` by hand.
 7. `ServerAliveInterval 60` keeps long pushes from being dropped by a firewall.
 
 #### 3.10.3 Confirm SSH agrees with you
@@ -734,7 +708,7 @@ Confirm you really are in a repository before running anything else here:
 git rev-parse --show-toplevel
 ```
 
-An error saying `not a git repository` means you are in the wrong directory. Two commands are exceptions. Anything using `git config --global` works from anywhere, because it writes to `~/.gitconfig`. And `git clone` in section 3.11.2 is run from the parent directory where you want the new repository to appear, for example:
+An error saying `not a git repository` means you are in the wrong directory. Two commands are exceptions. Anything using `git config --global` works from anywhere, because it writes to `~/.gitconfig`. And `git clone` in [section 3.11.2](#3112-clone-with-ssh-from-the-start) is run from the parent directory where you want the new repository to appear, for example:
 
 ```bash
 cd /c/git && pwd
@@ -782,7 +756,147 @@ GIT_SSH_COMMAND="ssh -v" git ls-remote git@github.com:<owner>/<repo>.git 2>&1 | 
 
 ---
 
-## 4. Multiple GitHub accounts or keys
+## 4. Start the `ssh-agent` automatically in every Git Bash window
+
+**Run from:** anywhere. Every path below is absolute, and `~/.bashrc` is edited in place.
+
+[Section 3.4](#34-get-the-ssh-agent-running) left you with an `ssh-agent` that dies when the window closes. This section hands the job to Git Bash: the first window you open after a reboot starts one `ssh-agent` and asks for your passphrase once, and every window after that reuses the same `ssh-agent` with your keys already in it. The passphrase becomes once per reboot rather than once per terminal.
+
+### 4.1 Check that Git Bash reads `~/.bashrc` at startup
+
+Git Bash opens as a login shell, and a login shell does not read `~/.bashrc` on its own. It reads `~/.bash_profile`, which Git for Windows creates with a line that sources `~/.bashrc` in turn. That indirection is why the block below goes in `~/.bashrc` and still runs. Confirm the chain before relying on it:
+
+```bash
+grep -l 'bashrc' ~/.bash_profile ~/.profile 2>/dev/null
+```
+
+Either filename in the output means `~/.bashrc` is sourced at startup, so carry on to [section 4.2](#42-add-the-startup-block). No output means the chain is broken, so repair it:
+
+```bash
+echo '[ -f ~/.bashrc ] && . ~/.bashrc' >> ~/.bash_profile
+```
+
+### 4.2 Add the startup block
+
+Append the block to `~/.bashrc`. This is the whole mechanism, and every part of it is explained immediately below:
+
+```bash
+cat >> ~/.bashrc <<'EOF'
+
+# Start one ssh-agent and reuse it in every Git Bash window.
+SSH_ENV="$HOME/.ssh/agent.env"
+SSH_KEYS=("$HOME/.ssh/id_ed25519")
+
+ssh_agent_load()  { [ -f "$SSH_ENV" ] && . "$SSH_ENV" >/dev/null 2>&1; }
+ssh_agent_start() { (umask 077; ssh-agent -s >"$SSH_ENV"); . "$SSH_ENV" >/dev/null; }
+ssh_agent_keys()  { for k in "${SSH_KEYS[@]}"; do [ -f "$k" ] && ssh-add "$k"; done; }
+
+ssh_agent_load
+ssh-add -l >/dev/null 2>&1
+case $? in
+  2) ssh_agent_start; ssh_agent_keys ;;
+  1) ssh_agent_keys ;;
+esac
+EOF
+```
+
+What each part is for:
+
+1. `SSH_ENV` names a small file holding the two variables, `SSH_AUTH_SOCK` and `SSH_AGENT_PID`, that tell a shell how to reach a running `ssh-agent`. Writing them to disk is the entire trick: it is how a second window finds the `ssh-agent` the first one started.
+2. `SSH_KEYS` lists the keys to load. It is a bash array rather than a plain string, so paths containing a space keep working, which matters because a Windows home directory is named after the account and account names often contain a space.
+3. `ssh_agent_start` runs under `umask 077`, so only you can read the file. It holds no key material, but it does point at your `ssh-agent`'s socket.
+4. The `case` turns on the exit code of `ssh-add -l` from [section 3.6.2](#362-which-keys-does-the-ssh-agent-currently-hold), and it is what makes the block reliable. **2** means no `ssh-agent` is reachable, so start one and load the keys. **1** means an `ssh-agent` is running but empty, so load the keys into the `ssh-agent` that already exists instead of starting a second one. **0** means the keys are already there, so it does nothing.
+
+That third case is the one usually left out. Without it, a window opened after `ssh-add -D`, or after a key added with `ssh-add -t` expired, finds a running `ssh-agent`, concludes there is nothing to do, and leaves you with no key loaded and no explanation.
+
+### 4.3 Apply it and confirm it works
+
+Apply it to the shell you are already in, without opening a new window:
+
+```bash
+source ~/.bashrc
+```
+
+The real test is a second window, because that is the case the block exists for. Open a new Git Bash window and ask it what it can see:
+
+```bash
+ssh-add -l && echo "SSH_AGENT_PID=$SSH_AGENT_PID"
+```
+
+Your key and a process id, with no passphrase prompt, means it worked. Now confirm that the new window joined the existing `ssh-agent` rather than starting its own, which is the failure this whole section exists to prevent:
+
+```bash
+ps aux | grep -ic "[s]sh-agent"
+```
+
+The answer must be `1`. A count that climbs every time you open a window means `~/.bashrc` is not being read, so go back to [section 4.1](#41-check-that-git-bash-reads-bashrc-at-startup).
+
+### 4.4 Load more than one key
+
+Add each key to the array, separated by a space. The work and personal keys from [section 5](#5-multiple-github-accounts-or-keys) are the usual reason to. Order matters, because it is both the order they load in and the order you are asked for passphrases, so put your everyday key first:
+
+```bash
+SSH_KEYS=("$HOME/.ssh/id_ed25519" "$HOME/.ssh/id_ed25519_work" "$HOME/.ssh/id_ed25519_personal")
+```
+
+That one line is the only edit. The loop in [section 4.2](#42-add-the-startup-block) already walks whatever the array holds, so nothing else in the block changes.
+
+Keys that do not exist are skipped, so naming a key you have not generated yet is harmless. That makes it safe to write the array once and generate the keys later.
+
+Here is what the first window after a reboot prints with those three keys, where the first has no passphrase and the other two do:
+
+```text
+Identity added: /c/Users/<username>/.ssh/id_ed25519 (<email>)
+Enter passphrase for /c/Users/<username>/.ssh/id_ed25519_work:
+Identity added: /c/Users/<username>/.ssh/id_ed25519_work (<email>)
+Enter passphrase for /c/Users/<username>/.ssh/id_ed25519_personal:
+Identity added: /c/Users/<username>/.ssh/id_ed25519_personal (<email>)
+```
+
+Confirm all three arrived, and that every later window sees them without asking again:
+
+```bash
+ssh-add -l
+```
+
+### 4.5 What happens when a key has a passphrase
+
+Each protected key is a separate prompt, and the terminal waits at each one, so three protected keys means three prompts before you get a usable shell. That happens once per reboot, not once per window. Four behaviours are worth knowing before you commit to a long array:
+
+1. **A key with no passphrase loads silently.** Convenient, and the reason to think twice: the file on its own is then enough to authenticate as you, with nothing else required.
+2. **A key that fails does not stop the ones after it.** Give up on a passphrase, or point the array at a damaged file, and `ssh-add` reports that one key and carries on to the next. This is why the everyday key belongs first in the array: it is already loaded before you reach any prompt you might skip.
+3. **A wrong passphrase asks again** instead of failing immediately. Once you stop trying, that key is simply not loaded, and nothing else is affected. Add it by hand whenever you want it, exactly as in [section 3.5](#35-load-the-key-into-the-ssh-agent).
+4. **Nothing is cached between keys.** Two keys sharing the same passphrase still ask twice, because the `ssh-agent` holds decrypted keys rather than passphrases.
+
+If prompting for every key at every reboot is more than you want, leave the occasional ones out of `SSH_KEYS` entirely. The `AddKeysToAgent yes` line from [section 3.10.2](#3102-create-the-file) tells `ssh` to add a key to the `ssh-agent` the first time it actually uses it, so a key you need once a month asks for its passphrase then rather than every morning. Give it its own `Host` block as in [section 5](#5-multiple-github-accounts-or-keys), and it loads on your first push to that host.
+
+### 4.6 What to expect, and how to undo it
+
+Once the block is in place, this is the lifecycle:
+
+| Moment | What happens |
+|--------|--------------|
+| First Git Bash window after a reboot | No `ssh-agent` is reachable, so one starts and asks for your passphrase once |
+| Every window after that | Joins the running `ssh-agent`, no prompt |
+| After `ssh-add -D`, or a `ssh-add -t` lifetime expiring | The next window reloads your keys into the same `ssh-agent` |
+| Closing every Git Bash window | The `ssh-agent` keeps running, because it is not a child of any shell |
+| Shutting down or rebooting | The `ssh-agent` dies, and `~/.ssh/agent.env` is left pointing at nothing until the next window replaces it |
+
+To undo it, open `~/.bashrc` and delete the block, which runs from the comment line down to `esac`:
+
+```bash
+nano ~/.bashrc
+```
+
+Then stop the `ssh-agent` it started and remove the file it kept:
+
+```bash
+ssh-agent -k && rm -f ~/.ssh/agent.env
+```
+
+---
+
+## 5. Multiple GitHub accounts or keys
 
 **Run from:** `~/.ssh` to edit the config, then from wherever you keep your repositories to clone.
 
@@ -790,7 +904,7 @@ GIT_SSH_COMMAND="ssh -v" git ls-remote git@github.com:<owner>/<repo>.git 2>&1 | 
 cd ~/.ssh && pwd
 ```
 
-A single key cannot be attached to two GitHub accounts, so use one key per account plus a host alias. Append both blocks to the `~/.ssh/config` file from section 3.10.2, with the same heredoc or editor:
+A single key cannot be attached to two GitHub accounts, so use one key per account plus a host alias. Append both blocks to the `~/.ssh/config` file from [section 3.10.2](#3102-create-the-file), with the same heredoc or editor:
 
 ```sshconfig
 Host github-personal
@@ -828,7 +942,7 @@ Each test should greet you with the matching username.
 
 ---
 
-## 5. Optional: sign commits with the same SSH key
+## 6. Optional: sign commits with the same SSH key
 
 **Run from:** anywhere for the `git config --global` lines, then inside a repository for the `git log` verification at the end.
 
@@ -866,7 +980,7 @@ Reference: <https://docs.github.com/en/authentication/managing-commit-signature-
 
 ---
 
-## 6. File permissions
+## 7. File permissions
 
 **Run from:** `~/.ssh`.
 
@@ -904,30 +1018,30 @@ Symptom of wrong permissions: `WARNING: UNPROTECTED PRIVATE KEY FILE!` followed 
 
 ---
 
-## 7. Troubleshooting matrix
+## 8. Troubleshooting matrix
 
 Find the symptom in the first column, run the command in the third to confirm the cause, then apply the fix. The symptoms are written as the error text you will actually see:
 
 | Symptom | Likely cause | Command that confirms it | Fix |
 |---------|--------------|--------------------------|-----|
 | `Permission denied (publickey)` | Key not offered, or not registered | `ssh -vT git@github.com` | Check `ssh-add -l`, compare the fingerprint with <https://github.com/settings/keys> |
-| `The agent has no identities.` | Agent is empty | `ssh-add -l` | `ssh-add ~/.ssh/id_ed25519` |
-| `Could not open a connection to your authentication agent.` | No agent in this shell | `echo $SSH_AUTH_SOCK` | `eval "$(ssh-agent -s)"`, then section 3.4.2 |
-| Agent forgotten in every new Git Bash window | Each window spawns its own agent | `ps aux \| grep [s]sh-agent` shows several | The `~/.bashrc` block, section 3.4.2 |
-| Passphrase prompted on every `git push` | Git is calling a different ssh client than the one your agent belongs to | `git config --global --get core.sshCommand` | `git config --global --unset core.sshCommand` |
-| `Too many authentication failures` | Agent offers many keys, the server cuts you off | `ssh -vT git@github.com` | Add `IdentitiesOnly yes` to `~/.ssh/config` |
-| Greeted as the wrong username | Wrong key matched first | `ssh -T git@github.com` | Host aliases, section 4 |
-| `Host key verification failed` | Host key changed or `known_hosts` is stale | `ssh-keygen -F github.com` | Verify the fingerprint (section 3.9), then `ssh-keygen -R github.com` |
-| `Connection timed out` on port 22 | Network blocks SSH | The `/dev/tcp` check in section 3.8.5 | Use port 443, section 3.8.5 |
-| `UNPROTECTED PRIVATE KEY FILE` | Permissions too open | `ls -l ~/.ssh/id_ed25519` | Section 6 |
+| `The agent has no identities.` | `ssh-agent` is empty | `ssh-add -l` | `ssh-add ~/.ssh/id_ed25519` |
+| `Could not open a connection to your authentication agent.` | No `ssh-agent` in this shell | `echo $SSH_AUTH_SOCK` | `eval "$(ssh-agent -s)"`, then [section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) |
+| `ssh-agent` forgotten in every new Git Bash window | Each window spawns its own `ssh-agent` | `ps aux \| grep [s]sh-agent` shows several | The `~/.bashrc` block, [section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) |
+| Passphrase prompted on every `git push` | Git is calling a different ssh client than the one your `ssh-agent` belongs to | `git config --global --get core.sshCommand` | `git config --global --unset core.sshCommand` |
+| `Too many authentication failures` | `ssh-agent` offers many keys, the server cuts you off | `ssh -vT git@github.com` | Add `IdentitiesOnly yes` to `~/.ssh/config` |
+| Greeted as the wrong username | Wrong key matched first | `ssh -T git@github.com` | Host aliases, [section 5](#5-multiple-github-accounts-or-keys) |
+| `Host key verification failed` | Host key changed or `known_hosts` is stale | `ssh-keygen -F github.com` | Verify the fingerprint ([section 3.9](#39-verify-you-are-talking-to-the-real-github)), then `ssh-keygen -R github.com` |
+| `Connection timed out` on port 22 | Network blocks SSH | The `/dev/tcp` check in [section 3.8.5](#385-if-port-22-is-blocked-corporate-network-hotel-wifi) | Use port 443, [section 3.8.5](#385-if-port-22-is-blocked-corporate-network-hotel-wifi) |
+| `UNPROTECTED PRIVATE KEY FILE` | Permissions too open | `ls -l ~/.ssh/id_ed25519` | [Section 7](#7-file-permissions) |
 | `ssh-add` reports `Invalid format` | Key file mangled by an editor, or it is a PuTTY `.ppk` | `ssh-keygen -l -f ~/.ssh/id_ed25519` | Regenerate, or convert the `.ppk` with PuTTYgen |
 | Command hangs with no prompt | Git Bash TTY (TeleTYpe) issue | n/a | Prefix with `winpty` |
 | A path argument gets rewritten oddly | MSYS2 path conversion | n/a | Prefix with `MSYS_NO_PATHCONV=1` |
-| `git push` fails but `ssh -T` works | The remote is still HTTPS | `git remote -v` | Section 3.11.1 |
+| `git push` fails but `ssh -T` works | The remote is still HTTPS | `git remote -v` | [Section 3.11.1](#3111-point-an-existing-repository-at-ssh-instead-of-https) |
 
 ---
 
-## 8. Full verification checklist
+## 9. Full verification checklist
 
 **Run from:** anywhere, `cd ~` is a fine default.
 
@@ -951,21 +1065,21 @@ What each line should print, in the same order. If one does not match, the last 
 
 | Command | Passing looks like | If not |
 |---------|--------------------|--------|
-| `ssh -V` | `OpenSSH_` followed by 7.0 or newer | Section 3.1.1 |
-| `command -v ssh` | `/usr/bin/ssh` | Section 3.1.1 |
-| `echo "SSH_AUTH_SOCK=..."` | A socket path, not `<none>` | Section 3.4 |
-| `ps aux \| grep ...` | At least one `ssh-agent` line | Section 3.4 |
-| `ssh-add -l; echo ...` | Your key listed, then `ssh-add exit: 0` | Section 3.5 |
-| `ssh-keygen -l -f ~/.ssh/id_ed25519.pub` | The same `SHA256:` value the previous line printed | Section 3.6.3 |
-| `ssh -G github.com \| grep ...` | `identityfile ~/.ssh/id_ed25519` and `identitiesonly yes` | Section 3.10.3 |
-| `ssh-keygen -F github.com \| head -1` | `# Host github.com found: line 1` | Section 3.9 |
-| `ssh-keyscan github.com \| ssh-keygen -lf -` | Fingerprints matching the three listed in section 3.9 | Section 3.9 |
-| `ssh -T git@github.com` | `Hi <username>! You've successfully authenticated...` | Section 3.8 |
-| `git config --global --get core.sshCommand` | Nothing at all | Section 3.1.1 |
+| `ssh -V` | `OpenSSH_` followed by 7.0 or newer | [Section 3.1.1](#311-which-ssh-client-is-this-shell-using) |
+| `command -v ssh` | `/usr/bin/ssh` | [Section 3.1.1](#311-which-ssh-client-is-this-shell-using) |
+| `echo "SSH_AUTH_SOCK=..."` | A socket path, not `<none>` | [Section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) |
+| `ps aux \| grep ...` | Exactly one `ssh-agent` line | [Section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) |
+| `ssh-add -l; echo ...` | Your key listed, then `ssh-add exit: 0` | [Section 3.5](#35-load-the-key-into-the-ssh-agent) |
+| `ssh-keygen -l -f ~/.ssh/id_ed25519.pub` | The same `SHA256:` value the previous line printed | [Section 3.6.3](#363-does-the-ssh-agent-key-match-the-key-on-disk-and-the-key-on-github) |
+| `ssh -G github.com \| grep ...` | `identityfile ~/.ssh/id_ed25519` and `identitiesonly yes` | [Section 3.10.3](#3103-confirm-ssh-agrees-with-you) |
+| `ssh-keygen -F github.com \| head -1` | `# Host github.com found: line 1` | [Section 3.9](#39-verify-you-are-talking-to-the-real-github) |
+| `ssh-keyscan github.com \| ssh-keygen -lf -` | Fingerprints matching the three listed in [section 3.9](#39-verify-you-are-talking-to-the-real-github) | [Section 3.9](#39-verify-you-are-talking-to-the-real-github) |
+| `ssh -T git@github.com` | `Hi <username>! You've successfully authenticated...` | [Section 3.8](#38-test-the-connection-to-github-manually) |
+| `git config --global --get core.sshCommand` | Nothing at all | [Section 3.1.1](#311-which-ssh-client-is-this-shell-using) |
 
 ---
 
-## 9. Cheat sheet
+## 10. Cheat sheet
 
 Once the setup works, this is the only section you should need again:
 
@@ -975,10 +1089,10 @@ Once the setup works, this is the only section you should need again:
 | Show public key | `cat ~/.ssh/id_ed25519.pub` |
 | Copy public key | `cat ~/.ssh/id_ed25519.pub \| clip.exe` |
 | Fingerprint of a key file | `ssh-keygen -l -f ~/.ssh/id_ed25519.pub` |
-| Start agent | `eval "$(ssh-agent -s)"` |
-| Stop agent | `ssh-agent -k` |
-| Is this shell agent aware | `echo $SSH_AUTH_SOCK` |
-| Is an agent process alive | `ps aux \| grep [s]sh-agent` |
+| Start `ssh-agent` | `eval "$(ssh-agent -s)"` |
+| Stop `ssh-agent` | `ssh-agent -k` |
+| Is this shell `ssh-agent` aware | `echo $SSH_AUTH_SOCK` |
+| Is an `ssh-agent` process alive | `ps aux \| grep [s]sh-agent` |
 | Add key | `ssh-add ~/.ssh/id_ed25519` |
 | Add key for 8 hours | `ssh-add -t 8h ~/.ssh/id_ed25519` |
 | List loaded fingerprints | `ssh-add -l` |
@@ -1001,12 +1115,12 @@ Once the setup works, this is the only section you should need again:
 
 ---
 
-## 10. Terminology
+## 11. Terminology
 
 Every acronym is also expanded where it first appears, so you can read straight through without coming here. This section is for looking one up later, so it carries every term the document uses, listed alphabetically.
 
 1. **API** = Application Programming Interface. Used here for <https://api.github.com/meta>, which publishes GitHub's live host key fingerprints.
-2. **CI** = Continuous Integration, an automated build server. It matters here because a CI job starts in a fresh shell with no agent in it.
+2. **CI** = Continuous Integration, an automated build server. It matters here because a CI job starts in a fresh shell with no `ssh-agent` in it.
 3. **CLI** = Command Line Interface. **`gh`** = the official GitHub CLI.
 4. **DSA** = Digital Signature Algorithm, an obsolete key type removed from modern OpenSSH. Never generate one.
 5. **ECDSA** = Elliptic Curve Digital Signature Algorithm, the older elliptic curve key type. Still accepted, superseded by Ed25519.
@@ -1022,13 +1136,13 @@ Every acronym is also expanded where it first appears, so you can read straight 
 15. **RSA** = Rivest Shamir Adleman, the legacy key type, still accepted at 4096 bits.
 16. **SSH** = Secure Shell, the protocol Git uses over port 22 for authenticated pushes and pulls.
 17. **`ssh-agent`** = a background process that holds your decrypted private key in memory so you type the passphrase once per session.
-18. **TCP** = Transmission Control Protocol, the transport SSH runs over. Section 3.8.5 uses the bash `/dev/tcp` pseudo device to test whether port 22 is reachable at all.
+18. **TCP** = Transmission Control Protocol, the transport SSH runs over. [Section 3.8.5](#385-if-port-22-is-blocked-corporate-network-hotel-wifi) uses the bash `/dev/tcp` pseudo device to test whether port 22 is reachable at all.
 19. **TOFU** = Trust On First Use, the model where SSH remembers a server host key the first time you connect.
 20. **TTY** = TeleTYpe, a terminal a program can prompt on. Git Bash sometimes needs `winpty` to supply one.
 
 ---
 
-## 11. References (every link checked, HTTP 200)
+## 12. References (every link checked, HTTP 200)
 
 Every link below was fetched and returned HTTP (HyperText Transfer Protocol) status 200.
 
