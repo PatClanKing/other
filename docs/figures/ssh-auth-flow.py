@@ -11,16 +11,59 @@ is the wire to GitHub, so the band around it is kept empty. Routing is direct
 rather than orthogonal, so each pair that is linked has a clear straight line
 between it and nothing parked in the way.
 """
+import math
 from pathlib import Path
 
 from drawio_model import Diagram, Group
 
 d = Diagram("SSH auth flow", page_w=1840, page_h=1100, route="direct")
 
+INK    = "#1F3A5F"   # glyph line
+WARM   = "#B3541E"   # glyph accent
 CMD    = "#E3F2FD"   # things you run
 PROC   = "#E8F5E9"   # running processes
 FILE   = "#FFF8E1"   # files on disk
 REMOTE = "#FCE4EC"   # the far end
+
+def _poly(pid, pts, close=True, colour=INK, width=2.4):
+    pts = list(pts) + ([pts[0]] if close else [])
+    d.polyline(pid, pts, arrow=False, colour=colour, width=width)
+
+
+def _line(pid, a, b, colour=INK, width=2.4):
+    d.polyline(pid, [a, b], arrow=False, colour=colour, width=width)
+
+
+def _arc(pid, cx, cy, rx, ry, a0, a1, n=28, colour=INK, width=2.4):
+    pts = [(round(cx + rx * math.cos(math.radians(a0 + (a1 - a0) * i / n))),
+            round(cy + ry * math.sin(math.radians(a0 + (a1 - a0) * i / n))))
+           for i in range(n + 1)]
+    d.polyline(pid, pts, arrow=False, colour=colour, width=width)
+
+
+def agent_glyph(cx, cy, s=1.0):
+    """The agent: hat, shades, earpiece, deliberately no face.
+
+    Drawn rather than described, because the one thing this figure has to land is
+    that the key goes in and never comes out, and a silhouette that is visibly
+    keeping a secret says that before anybody reads a label. Built from polylines
+    only, so it needs no shape type the rest of the diagram does not already use.
+    """
+    def p(x, y):
+        return (round(cx + x * s), round(cy + y * s))
+
+    _poly("g-brim", [p(-76, -44), p(76, -44), p(62, -30), p(-62, -30)])
+    _poly("g-crown", [p(-42, -44), p(-36, -94), p(36, -94), p(42, -44)])
+    _line("g-band", p(-40, -56), p(40, -56), width=1.8)
+    _arc("g-face", cx, cy - 26 * s, 40 * s, 40 * s, 0, 180)
+    _poly("g-lens-l", [p(-36, -20), p(-8, -20), p(-10, -2), p(-32, -2)], colour=WARM)
+    _poly("g-lens-r", [p(8, -20), p(36, -20), p(32, -2), p(10, -2)], colour=WARM)
+    _line("g-bridge", p(-8, -16), p(8, -16), colour=WARM, width=1.8)
+    _line("g-coat-l", p(-46, 16), p(-14, 44))
+    _line("g-coat-r", p(46, 16), p(14, 44))
+    _poly("g-tie", [p(0, 22), p(9, 34), p(0, 62), p(-9, 34)])
+    _arc("g-wire", cx + 46 * s, cy + 4 * s, 26 * s, 26 * s, 250, 340, colour=WARM, width=1.8)
+
 
 # ------------------------------------------------- your machine, the top band
 d.block("git", "git push\ngit clone / fetch", 60, 100, w=210, h=100, fill=CMD)
@@ -31,8 +74,14 @@ d.block("ssh", "ssh\n/usr/bin/ssh\nthe only one of these\nthat reads the config"
 d.block("config", "~/.ssh/config\nHost github.com\n  IdentityFile ~/.ssh/id_ed25519\n"
                   "  IdentitiesOnly yes\n  AddKeysToAgent yes",
         120, 380, w=280, h=130, fill=FILE)
-d.block("agent", "ssh-agent\nholds the decrypted key\nin memory, reached over\n$SSH_AUTH_SOCK",
-        450, 400, w=250, h=110, fill=PROC)
+# Two parts on purpose. The writer paints every block over every polyline, so a
+# filled box would bury the glyph. The outer frame is therefore unfilled and carries
+# the drawing, and the caption sits in a filled panel below it, which also keeps the
+# green that the legend uses for a running process.
+d.block("agent", "", 440, 370, w=270, h=200, fill="none")
+agent_glyph(575, 424, s=0.46)
+d.block("agent-panel", "ssh-agent\nholds the decrypted key in memory,\nreached over $SSH_AUTH_SOCK",
+        450, 462, w=250, h=98, fill=PROC)
 d.block("known", "~/.ssh/known_hosts\nhost keys this machine\nhas already trusted",
         790, 380, w=250, h=110, fill=FILE)
 

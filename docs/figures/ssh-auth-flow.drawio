@@ -27,11 +27,162 @@ Host github.com
   AddKeysToAgent yes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
           <mxGeometry x="82" y="338" width="280" height="130" as="geometry"/>
         </mxCell>
-        <mxCell id="agent" value="ssh-agent
-holds the decrypted key
-in memory, reached over
-$SSH_AUTH_SOCK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
-          <mxGeometry x="412" y="358" width="250" height="110" as="geometry"/>
+        <mxCell id="agent" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
+          <mxGeometry x="402" y="328" width="270" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="g-brim" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#1F3A5F;strokeWidth=2.4;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="540" y="404" as="sourcePoint"/>
+            <mxPoint x="540" y="404" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="610" y="404"/>
+              <mxPoint x="604" y="410"/>
+              <mxPoint x="546" y="410"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-crown" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#1F3A5F;strokeWidth=2.4;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="556" y="404" as="sourcePoint"/>
+            <mxPoint x="556" y="404" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="558" y="381"/>
+              <mxPoint x="592" y="381"/>
+              <mxPoint x="594" y="404"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-band" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#1F3A5F;strokeWidth=1.8;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="557" y="398" as="sourcePoint"/>
+            <mxPoint x="593" y="398" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-face" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#1F3A5F;strokeWidth=2.4;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="593" y="412" as="sourcePoint"/>
+            <mxPoint x="557" y="412" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="593" y="414"/>
+              <mxPoint x="593" y="416"/>
+              <mxPoint x="592" y="418"/>
+              <mxPoint x="592" y="420"/>
+              <mxPoint x="591" y="422"/>
+              <mxPoint x="589" y="424"/>
+              <mxPoint x="588" y="425"/>
+              <mxPoint x="586" y="426"/>
+              <mxPoint x="585" y="428"/>
+              <mxPoint x="583" y="429"/>
+              <mxPoint x="581" y="429"/>
+              <mxPoint x="579" y="430"/>
+              <mxPoint x="577" y="430"/>
+              <mxPoint x="575" y="430"/>
+              <mxPoint x="573" y="430"/>
+              <mxPoint x="571" y="430"/>
+              <mxPoint x="569" y="429"/>
+              <mxPoint x="567" y="429"/>
+              <mxPoint x="565" y="428"/>
+              <mxPoint x="564" y="426"/>
+              <mxPoint x="562" y="425"/>
+              <mxPoint x="561" y="424"/>
+              <mxPoint x="559" y="422"/>
+              <mxPoint x="558" y="420"/>
+              <mxPoint x="558" y="418"/>
+              <mxPoint x="557" y="416"/>
+              <mxPoint x="557" y="414"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-lens-l" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#B3541E;strokeWidth=2.4;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="558" y="415" as="sourcePoint"/>
+            <mxPoint x="558" y="415" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="571" y="415"/>
+              <mxPoint x="570" y="423"/>
+              <mxPoint x="560" y="423"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-lens-r" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#B3541E;strokeWidth=2.4;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="579" y="415" as="sourcePoint"/>
+            <mxPoint x="579" y="415" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="592" y="415"/>
+              <mxPoint x="590" y="423"/>
+              <mxPoint x="580" y="423"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-bridge" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#B3541E;strokeWidth=1.8;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="571" y="417" as="sourcePoint"/>
+            <mxPoint x="579" y="417" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-coat-l" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#1F3A5F;strokeWidth=2.4;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="554" y="431" as="sourcePoint"/>
+            <mxPoint x="569" y="444" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-coat-r" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#1F3A5F;strokeWidth=2.4;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="596" y="431" as="sourcePoint"/>
+            <mxPoint x="581" y="444" as="targetPoint"/>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-tie" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#1F3A5F;strokeWidth=2.4;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="575" y="434" as="sourcePoint"/>
+            <mxPoint x="575" y="434" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="579" y="440"/>
+              <mxPoint x="575" y="453"/>
+              <mxPoint x="571" y="440"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g-wire" value="" style="edgeStyle=none;html=1;rounded=0;strokeColor=#B3541E;strokeWidth=1.8;fontSize=11;endArrow=none;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="592" y="415" as="sourcePoint"/>
+            <mxPoint x="607" y="422" as="targetPoint"/>
+            <Array as="points">
+              <mxPoint x="593" y="414"/>
+              <mxPoint x="593" y="414"/>
+              <mxPoint x="594" y="414"/>
+              <mxPoint x="595" y="414"/>
+              <mxPoint x="595" y="414"/>
+              <mxPoint x="596" y="414"/>
+              <mxPoint x="597" y="414"/>
+              <mxPoint x="597" y="414"/>
+              <mxPoint x="598" y="414"/>
+              <mxPoint x="599" y="414"/>
+              <mxPoint x="599" y="414"/>
+              <mxPoint x="600" y="415"/>
+              <mxPoint x="601" y="415"/>
+              <mxPoint x="601" y="415"/>
+              <mxPoint x="602" y="415"/>
+              <mxPoint x="602" y="416"/>
+              <mxPoint x="603" y="416"/>
+              <mxPoint x="603" y="416"/>
+              <mxPoint x="604" y="417"/>
+              <mxPoint x="605" y="417"/>
+              <mxPoint x="605" y="418"/>
+              <mxPoint x="605" y="418"/>
+              <mxPoint x="606" y="419"/>
+              <mxPoint x="606" y="419"/>
+              <mxPoint x="607" y="420"/>
+              <mxPoint x="607" y="421"/>
+              <mxPoint x="607" y="421"/>
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="agent-panel" value="ssh-agent
+holds the decrypted key in memory,
+reached over $SSH_AUTH_SOCK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="450" y="462" width="250" height="98" as="geometry"/>
         </mxCell>
         <mxCell id="known" value="~/.ssh/known_hosts
 host keys this machine
