@@ -8,7 +8,7 @@
           <mxGeometry x="38" y="42" width="1024" height="970" as="geometry"/>
         </mxCell>
         <mxCell id="github" value="GitHub" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#37474F;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;fontStyle=1;fontSize=16;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="1128" y="42" width="644" height="970" as="geometry"/>
+          <mxGeometry x="1128" y="42" width="644" height="980" as="geometry"/>
         </mxCell>
         <mxCell id="git" value="git push
 git clone / fetch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
@@ -209,24 +209,40 @@ PUBLIC key
 safe to publish" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
           <mxGeometry x="752" y="598" width="250" height="110" as="geometry"/>
         </mxCell>
-        <mxCell id="sshd" value="github.com:22
+        <mxCell id="sshd" value="
+github.com:22
 SSH endpoint
 (or ssh.github.com:443)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="github">
-          <mxGeometry x="372" y="48" width="250" height="120" as="geometry"/>
+          <mxGeometry x="372" y="48" width="250" height="130" as="geometry"/>
         </mxCell>
-        <mxCell id="hostkey" value="GitHub host key
+        <mxCell id="sshd-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTAuMjI2IDE3LjI4NGMtMi45NjUtLjM2LTUuMDU0LTIuNDkzLTUuMDU0LTUuMjU2IDAtMS4xMjMuNDA0LTIuMzM2IDEuMDc4LTMuMTQ0LS4yOTItLjc0MS0uMjQ3LTIuMzE0LjA5LTIuOTY1Ljg5OC0uMTEyIDIuMTExLjM2IDIuODMgMS4wMS44NTMtLjI2OSAxLjc1Mi0uNDA0IDIuODUzLS40MDQgMS4xIDAgMS45OTkuMTM1IDIuODA3LjM4Mi42OTYtLjYyOSAxLjkzMi0xLjEgMi44My0uOTg4LjMxNS42MDYuMzYgMi4xNzkuMDY3IDIuOTQyLjcyLjg1NCAxLjEwMSAyIDEuMTAxIDMuMTY3IDAgMi43NjMtMi4wODkgNC44NTItNS4wOTggNS4yMzQuNzYzLjQ5NCAxLjI4IDEuNTcyIDEuMjggMi44MDd2Mi4zMzZjMCAuNjc0LjU2MSAxLjA1NiAxLjIzNS43ODYgNC4wNjYtMS41NSA3LjI1NS01LjYxNSA3LjI1NS0xMC42NDZDMjMuNSA2LjE4OCAxOC4zMzQgMSAxMS45NzggMSA1LjYyIDEgLjUgNi4xODguNSAxMi41NDVjMCA0Ljk4NiAzLjE2NyA5LjEyIDcuNDM1IDEwLjY2OS42MDYuMjI1IDEuMTktLjE4IDEuMTktLjc4NlYyMC42M2EyLjkgMi45IDAgMCAxLTEuMDc4LjIyNGMtMS40ODMgMC0yLjM1OS0uODA4LTIuOTg3LTIuMzEzLS4yNDctLjYwNy0uNTE3LS45NjYtMS4wMzQtMS4wMzMtLjI3LS4wMjMtLjM1OS0uMTM1LS4zNTktLjI3IDAtLjI3LjQ1LS40NzEuODk4LS40NzEuNjUyIDAgMS4yMTMuNDA0IDEuNzk3IDEuMjM1LjQ1LjY1MS45MjEuOTQzIDEuNDgzLjk0My41NjEgMCAuOTItLjIwMiAxLjQzNy0uNzE5LjM4Mi0uMzgxLjY3NC0uNzE4Ljk0NC0uOTQzIi8+PC9zdmc+;" vertex="1" parent="1">
+          <mxGeometry x="1610" y="101" width="30" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="hostkey" value="
+GitHub host key
 published at
 api.github.com/meta" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="github">
-          <mxGeometry x="22" y="338" width="240" height="110" as="geometry"/>
+          <mxGeometry x="22" y="338" width="240" height="120" as="geometry"/>
         </mxCell>
-        <mxCell id="acct" value="Your GitHub account
+        <mxCell id="hostkey-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTAuMjI2IDE3LjI4NGMtMi45NjUtLjM2LTUuMDU0LTIuNDkzLTUuMDU0LTUuMjU2IDAtMS4xMjMuNDA0LTIuMzM2IDEuMDc4LTMuMTQ0LS4yOTItLjc0MS0uMjQ3LTIuMzE0LjA5LTIuOTY1Ljg5OC0uMTEyIDIuMTExLjM2IDIuODMgMS4wMS44NTMtLjI2OSAxLjc1Mi0uNDA0IDIuODUzLS40MDQgMS4xIDAgMS45OTkuMTM1IDIuODA3LjM4Mi42OTYtLjYyOSAxLjkzMi0xLjEgMi44My0uOTg4LjMxNS42MDYuMzYgMi4xNzkuMDY3IDIuOTQyLjcyLjg1NCAxLjEwMSAyIDEuMTAxIDMuMTY3IDAgMi43NjMtMi4wODkgNC44NTItNS4wOTggNS4yMzQuNzYzLjQ5NCAxLjI4IDEuNTcyIDEuMjggMi44MDd2Mi4zMzZjMCAuNjc0LjU2MSAxLjA1NiAxLjIzNS43ODYgNC4wNjYtMS41NSA3LjI1NS01LjYxNSA3LjI1NS0xMC42NDZDMjMuNSA2LjE4OCAxOC4zMzQgMSAxMS45NzggMSA1LjYyIDEgLjUgNi4xODguNSAxMi41NDVjMCA0Ljk4NiAzLjE2NyA5LjEyIDcuNDM1IDEwLjY2OS42MDYuMjI1IDEuMTktLjE4IDEuMTktLjc4NlYyMC42M2EyLjkgMi45IDAgMCAxLTEuMDc4LjIyNGMtMS40ODMgMC0yLjM1OS0uODA4LTIuOTg3LTIuMzEzLS4yNDctLjYwNy0uNTE3LS45NjYtMS4wMzQtMS4wMzMtLjI3LS4wMjMtLjM1OS0uMTM1LS4zNTktLjI3IDAtLjI3LjQ1LS40NzEuODk4LS40NzEuNjUyIDAgMS4yMTMuNDA0IDEuNzk3IDEuMjM1LjQ1LjY1MS45MjEuOTQzIDEuNDgzLjk0My41NjEgMCAuOTItLjIwMiAxLjQzNy0uNzE5LjM4Mi0uMzgxLjY3NC0uNzE4Ljk0NC0uOTQzIi8+PC9zdmc+;" vertex="1" parent="1">
+          <mxGeometry x="1257" y="393" width="26" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="acct" value="
+Your GitHub account
 the public keys you
 registered in Settings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="github">
-          <mxGeometry x="22" y="598" width="240" height="110" as="geometry"/>
+          <mxGeometry x="22" y="598" width="240" height="120" as="geometry"/>
         </mxCell>
-        <mxCell id="repo" value="&lt;owner&gt;/&lt;repo&gt;.git
+        <mxCell id="acct-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTAuMjI2IDE3LjI4NGMtMi45NjUtLjM2LTUuMDU0LTIuNDkzLTUuMDU0LTUuMjU2IDAtMS4xMjMuNDA0LTIuMzM2IDEuMDc4LTMuMTQ0LS4yOTItLjc0MS0uMjQ3LTIuMzE0LjA5LTIuOTY1Ljg5OC0uMTEyIDIuMTExLjM2IDIuODMgMS4wMS44NTMtLjI2OSAxLjc1Mi0uNDA0IDIuODUzLS40MDQgMS4xIDAgMS45OTkuMTM1IDIuODA3LjM4Mi42OTYtLjYyOSAxLjkzMi0xLjEgMi44My0uOTg4LjMxNS42MDYuMzYgMi4xNzkuMDY3IDIuOTQyLjcyLjg1NCAxLjEwMSAyIDEuMTAxIDMuMTY3IDAgMi43NjMtMi4wODkgNC44NTItNS4wOTggNS4yMzQuNzYzLjQ5NCAxLjI4IDEuNTcyIDEuMjggMi44MDd2Mi4zMzZjMCAuNjc0LjU2MSAxLjA1NiAxLjIzNS43ODYgNC4wNjYtMS41NSA3LjI1NS01LjYxNSA3LjI1NS0xMC42NDZDMjMuNSA2LjE4OCAxOC4zMzQgMSAxMS45NzggMSA1LjYyIDEgLjUgNi4xODguNSAxMi41NDVjMCA0Ljk4NiAzLjE2NyA5LjEyIDcuNDM1IDEwLjY2OS42MDYuMjI1IDEuMTktLjE4IDEuMTktLjc4NlYyMC42M2EyLjkgMi45IDAgMCAxLTEuMDc4LjIyNGMtMS40ODMgMC0yLjM1OS0uODA4LTIuOTg3LTIuMzEzLS4yNDctLjYwNy0uNTE3LS45NjYtMS4wMzQtMS4wMzMtLjI3LS4wMjMtLjM1OS0uMTM1LS4zNTktLjI3IDAtLjI3LjQ1LS40NzEuODk4LS40NzEuNjUyIDAgMS4yMTMuNDA0IDEuNzk3IDEuMjM1LjQ1LjY1MS45MjEuOTQzIDEuNDgzLjk0My41NjEgMCAuOTItLjIwMiAxLjQzNy0uNzE5LjM4Mi0uMzgxLjY3NC0uNzE4Ljk0NC0uOTQzIi8+PC9zdmc+;" vertex="1" parent="1">
+          <mxGeometry x="1257" y="653" width="26" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="repo" value="
+&lt;owner&gt;/&lt;repo&gt;.git
 the remote repository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="github">
-          <mxGeometry x="372" y="848" width="250" height="100" as="geometry"/>
+          <mxGeometry x="372" y="848" width="250" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="repo-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNMTAuMjI2IDE3LjI4NGMtMi45NjUtLjM2LTUuMDU0LTIuNDkzLTUuMDU0LTUuMjU2IDAtMS4xMjMuNDA0LTIuMzM2IDEuMDc4LTMuMTQ0LS4yOTItLjc0MS0uMjQ3LTIuMzE0LjA5LTIuOTY1Ljg5OC0uMTEyIDIuMTExLjM2IDIuODMgMS4wMS44NTMtLjI2OSAxLjc1Mi0uNDA0IDIuODUzLS40MDQgMS4xIDAgMS45OTkuMTM1IDIuODA3LjM4Mi42OTYtLjYyOSAxLjkzMi0xLjEgMi44My0uOTg4LjMxNS42MDYuMzYgMi4xNzkuMDY3IDIuOTQyLjcyLjg1NCAxLjEwMSAyIDEuMTAxIDMuMTY3IDAgMi43NjMtMi4wODkgNC44NTItNS4wOTggNS4yMzQuNzYzLjQ5NCAxLjI4IDEuNTcyIDEuMjggMi44MDd2Mi4zMzZjMCAuNjc0LjU2MSAxLjA1NiAxLjIzNS43ODYgNC4wNjYtMS41NSA3LjI1NS01LjYxNSA3LjI1NS0xMC42NDZDMjMuNSA2LjE4OCAxOC4zMzQgMSAxMS45NzggMSA1LjYyIDEgLjUgNi4xODguNSAxMi41NDVjMCA0Ljk4NiAzLjE2NyA5LjEyIDcuNDM1IDEwLjY2OS42MDYuMjI1IDEuMTktLjE4IDEuMTktLjc4NlYyMC42M2EyLjkgMi45IDAgMCAxLTEuMDc4LjIyNGMtMS40ODMgMC0yLjM1OS0uODA4LTIuOTg3LTIuMzEzLS4yNDctLjYwNy0uNTE3LS45NjYtMS4wMzQtMS4wMzMtLjI3LS4wMjMtLjM1OS0uMTM1LS4zNTktLjI3IDAtLjI3LjQ1LS40NzEuODk4LS40NzEuNjUyIDAgMS4yMTMuNDA0IDEuNzk3IDEuMjM1LjQ1LjY1MS45MjEuOTQzIDEuNDgzLjk0My41NjEgMCAuOTItLjIwMiAxLjQzNy0uNzE5LjM4Mi0uMzgxLjY3NC0uNzE4Ljk0NC0uOTQzIi8+PC9zdmc+;" vertex="1" parent="1">
+          <mxGeometry x="1612" y="903" width="26" height="26" as="geometry"/>
         </mxCell>
         <mxCell id="t-key" value="The private key never travels. ssh proves you hold it by having the agent sign a challenge with it." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontColor=#102027;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="60" y="1031" width="803" height="18" as="geometry"/>

@@ -101,14 +101,21 @@ d.add(Group("machine", "Your machine, Git Bash on Windows",
                      "priv", "sshadd", "bashrc", "pub"], dashed=True))
 
 # ------------------------------------------------------------------- the far end
-d.block("sshd", "github.com:22\nSSH endpoint\n(or ssh.github.com:443)",
-        1500, 90, w=250, h=120, fill=REMOTE)
-d.block("hostkey", "GitHub host key\npublished at\napi.github.com/meta",
-        1150, 380, w=240, h=110, fill=REMOTE)
-d.block("acct", "Your GitHub account\nthe public keys you\nregistered in Settings",
-        1150, 640, w=240, h=110, fill=REMOTE)
-d.block("repo", "<owner>/<repo>.git\nthe remote repository",
-        1500, 890, w=250, h=100, fill=REMOTE)
+# The mark is placed, never redrawn. See assets/README.md for where it comes from.
+GH_MARK = str(Path(__file__).resolve().parent / "assets" / "github-mark.svg")
+
+d.block("sshd", "\ngithub.com:22\nSSH endpoint\n(or ssh.github.com:443)",
+        1500, 90, w=250, h=130, fill=REMOTE)
+d.image("sshd-mark", GH_MARK, 1625, 116, w=30)
+d.block("hostkey", "\nGitHub host key\npublished at\napi.github.com/meta",
+        1150, 380, w=240, h=120, fill=REMOTE)
+d.image("hostkey-mark", GH_MARK, 1270, 406, w=26)
+d.block("acct", "\nYour GitHub account\nthe public keys you\nregistered in Settings",
+        1150, 640, w=240, h=120, fill=REMOTE)
+d.image("acct-mark", GH_MARK, 1270, 666, w=26)
+d.block("repo", "\n<owner>/<repo>.git\nthe remote repository",
+        1500, 890, w=250, h=110, fill=REMOTE)
+d.image("repo-mark", GH_MARK, 1625, 916, w=26)
 
 d.add(Group("github", "GitHub",
             members=["sshd", "hostkey", "acct", "repo"], dashed=True))
