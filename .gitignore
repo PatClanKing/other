@@ -13,3 +13,7 @@ venv/
 # Python bytecode.
 __pycache__/
 *.py[cod]
+
+# Scratch working folder. Anything here is a draft or a throwaway render, never part
+# of a document, so it stays out of the repository.
+tmp/
