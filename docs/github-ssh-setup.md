@@ -34,14 +34,18 @@ Every command is copy pasteable.
 &nbsp;&nbsp;&nbsp;&nbsp;[4.4 Load more than one key](#44-load-more-than-one-key)  
 &nbsp;&nbsp;&nbsp;&nbsp;[4.5 What happens when a key has a passphrase](#45-what-happens-when-a-key-has-a-passphrase)  
 &nbsp;&nbsp;&nbsp;&nbsp;[4.6 What to expect, and how to undo it](#46-what-to-expect-and-how-to-undo-it)  
-[5. Multiple GitHub accounts or keys](#5-multiple-github-accounts-or-keys)  
-[6. Optional: sign commits with the same SSH key](#6-optional-sign-commits-with-the-same-ssh-key)  
-[7. File permissions](#7-file-permissions)  
-[8. Troubleshooting matrix](#8-troubleshooting-matrix)  
-[9. Full verification checklist](#9-full-verification-checklist)  
-[10. Cheat sheet](#10-cheat-sheet)  
-[11. Terminology](#11-terminology)  
-[12. References (every link checked, HTTP 200)](#12-references-every-link-checked-http-200)
+[5. The two files in `~/.ssh` that are not keys](#5-the-two-files-in-ssh-that-are-not-keys)  
+&nbsp;&nbsp;&nbsp;&nbsp;[5.1 `~/.ssh/config`, what you want to happen](#51-sshconfig-what-you-want-to-happen)  
+&nbsp;&nbsp;&nbsp;&nbsp;[5.2 `~/.ssh/known_hosts`, what has happened before](#52-sshknown_hosts-what-has-happened-before)  
+&nbsp;&nbsp;&nbsp;&nbsp;[5.3 Why neither file is a secret](#53-why-neither-file-is-a-secret)  
+[6. Multiple GitHub accounts or keys](#6-multiple-github-accounts-or-keys)  
+[7. Optional: sign commits with the same SSH key](#7-optional-sign-commits-with-the-same-ssh-key)  
+[8. File permissions](#8-file-permissions)  
+[9. Troubleshooting matrix](#9-troubleshooting-matrix)  
+[10. Full verification checklist](#10-full-verification-checklist)  
+[11. Cheat sheet](#11-cheat-sheet)  
+[12. Terminology](#12-terminology)  
+[13. References (every link checked, HTTP 200)](#13-references-every-link-checked-http-200)
 
 <!-- /toc -->
 
@@ -459,7 +463,7 @@ Two ways to hand that key to GitHub, ranked:
 | 1 | GitHub CLI (Command Line Interface) | `gh ssh-key add ~/.ssh/id_ed25519.pub --title "gitbash-laptop"` | Fastest and scriptable, needs `gh auth login` first. Manual: <https://cli.github.com/manual/gh_ssh-key_add> |
 | 2 | Web interface | <https://github.com/settings/keys> then "New SSH key" | No extra tooling, and the only route on a machine without `gh` |
 
-Both routes register the key for **authentication**. Signing commits needs the same public key uploaded a second time as a separate signing key, which is [section 6](#6-optional-sign-commits-with-the-same-ssh-key).
+Both routes register the key for **authentication**. Signing commits needs the same public key uploaded a second time as a separate signing key, which is [section 7](#7-optional-sign-commits-with-the-same-ssh-key).
 
 Concrete commands for rank 1. Authenticate `gh` first, which opens a browser and stores a token, so it is a one time step per machine:
 
@@ -621,7 +625,7 @@ Remove a stale or suspicious entry so it can be trusted again:
 ssh-keygen -R github.com
 ```
 
-Reference: <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints>
+[Section 5.2](#52-sshknown_hosts-what-has-happened-before) explains what `known_hosts` is doing with these values. Reference: <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints>
 
 ---
 
@@ -653,7 +657,7 @@ Two behaviours will eventually catch you out, so they are worth knowing now rath
 1. **First match wins, not last.** SSH takes its settings from the command line first, then this file, then `/etc/ssh/ssh_config`, and for any keyword the **first** value it obtains is the one used. This is the opposite of most configuration formats. A `Host *` block placed at the top of the file therefore silences every more specific block below it, so keep general blocks at the bottom.
 2. **Permissions are enforced.** The file must be readable and writable by you and not writable by anyone else, which is why `chmod 600` appears below. SSH refuses to use a config it considers too open.
 
-Full option reference, one entry per keyword: <https://man.openbsd.org/ssh_config.5>. The client that reads it is documented at <https://man.openbsd.org/ssh.1>, and the `ssh-agent` it hands keys to at <https://man.openbsd.org/ssh-agent.1>.
+[Section 5](#5-the-two-files-in-ssh-that-are-not-keys) covers what this file is for in its own right, alongside `known_hosts`. Full option reference, one entry per keyword: <https://man.openbsd.org/ssh_config.5>. The client that reads it is documented at <https://man.openbsd.org/ssh.1>, and the `ssh-agent` it hands keys to at <https://man.openbsd.org/ssh-agent.1>.
 
 #### 3.10.2 Create the file
 
@@ -686,7 +690,7 @@ nano ~/.ssh/config
 What each line in that block is doing:
 
 1. `Host github.com` opens the block. Everything indented under it applies when the address you typed matches this pattern.
-2. `HostName github.com` is the address SSH actually connects to. It is the same here, but it is what makes host aliases possible in [section 5](#5-multiple-github-accounts-or-keys).
+2. `HostName github.com` is the address SSH actually connects to. It is the same here, but it is what makes host aliases possible in [section 6](#6-multiple-github-accounts-or-keys).
 3. `User git` is the SSH username, which for GitHub is always the literal word `git`. Your GitHub account is identified by the key, not by this name.
 4. `IdentityFile` picks the key.
 5. `IdentitiesOnly yes` offers only that key, avoiding wrong account logins and `Too many authentication failures`.
@@ -844,7 +848,7 @@ The answer must be `1`. A count that climbs every time you open a window means `
 
 ### 4.4 Load more than one key
 
-Add each key to the array, separated by a space. The work and personal keys from [section 5](#5-multiple-github-accounts-or-keys) are the usual reason to. Order matters, because it is both the order they load in and the order you are asked for passphrases, so put your everyday key first:
+Add each key to the array, separated by a space. The work and personal keys from [section 6](#6-multiple-github-accounts-or-keys) are the usual reason to. Order matters, because it is both the order they load in and the order you are asked for passphrases, so put your everyday key first:
 
 ```bash
 SSH_KEYS=("$HOME/.ssh/id_ed25519" "$HOME/.ssh/id_ed25519_work" "$HOME/.ssh/id_ed25519_personal")
@@ -879,7 +883,7 @@ Each protected key is a separate prompt, and the terminal waits at each one, so 
 3. **A wrong passphrase asks again** instead of failing immediately. Once you stop trying, that key is simply not loaded, and nothing else is affected. Add it by hand whenever you want it, exactly as in [section 3.5](#35-load-the-key-into-the-ssh-agent).
 4. **Nothing is cached between keys.** Two keys sharing the same passphrase still ask twice, because the `ssh-agent` holds decrypted keys rather than passphrases.
 
-If prompting for every key at every reboot is more than you want, leave the occasional ones out of `SSH_KEYS` entirely. The `AddKeysToAgent yes` line from [section 3.10.2](#3102-create-the-file) tells `ssh` to add a key to the `ssh-agent` the first time it actually uses it, so a key you need once a month asks for its passphrase then rather than every morning. Give it its own `Host` block as in [section 5](#5-multiple-github-accounts-or-keys), and it loads on your first push to that host.
+If prompting for every key at every reboot is more than you want, leave the occasional ones out of `SSH_KEYS` entirely. The `AddKeysToAgent yes` line from [section 3.10.2](#3102-create-the-file) tells `ssh` to add a key to the `ssh-agent` the first time it actually uses it, so a key you need once a month asks for its passphrase then rather than every morning. Give it its own `Host` block as in [section 6](#6-multiple-github-accounts-or-keys), and it loads on your first push to that host.
 
 ### 4.6 What to expect, and how to undo it
 
@@ -907,7 +911,72 @@ ssh-agent -k && rm -f ~/.ssh/agent.env
 
 ---
 
-## 5. Multiple GitHub accounts or keys
+## 5. The two files in `~/.ssh` that are not keys
+
+**Run from:** `~/.ssh`, since both files live there.
+
+[Section 3](#3-the-full-procedure) created these in passing, as steps to get through. They are worth ten minutes on their own, because between them they answer most of the questions that start with "why is SSH doing that". One says what you want to happen, the other remembers what has happened before, and neither holds any key material.
+
+The pair divides cleanly. `config` is yours, you write it, and it is read every time you run `ssh`. `known_hosts` is written by SSH on your behalf, and you normally only touch it to delete a line.
+
+| File | Who writes it | What it answers | Lost or deleted? |
+|------|---------------|-----------------|------------------|
+| `~/.ssh/config` | You, by hand | Which key, which host, which port, which options | Nothing breaks. Every option goes back to its default, so you are back to typing flags |
+| `~/.ssh/known_hosts` | SSH, automatically on first connect | Have I seen this server before, and was its key the same as today | Nothing breaks. You are asked to trust each host again on next connect |
+
+### 5.1 `~/.ssh/config`, what you want to happen
+
+It is a settings file for the **SSH client** and nothing else. It maps a host you type to the options SSH should use for it, so a command you could not remember collapses into one you can. That is the whole idea: the file stores flags you would otherwise type every time.
+
+[Section 3.10](#310-the-sshconfig-file) covers creating it and the precise behaviour that catches people out, which is that the **first** value SSH finds for a keyword wins rather than the last. Two things are worth adding here.
+
+The first is that it is read, not executed. There is no ordering requirement beyond first match winning, no syntax to learn beyond `Keyword value`, and an unknown keyword is an error rather than something silently ignored. Check what SSH concluded rather than what you wrote:
+
+```bash
+ssh -G github.com
+```
+
+The second is that the file does not have to exist. SSH has defaults for everything in it, so deleting it costs you convenience and nothing else. That makes it safe to experiment with: keep a copy, break it, and compare with `ssh -G`.
+
+Full keyword reference, one entry each: <https://man.openbsd.org/ssh_config.5>
+
+### 5.2 `~/.ssh/known_hosts`, what has happened before
+
+This is SSH's memory of which server is which. The first time you connect to a host, SSH has no way to know whether the machine answering is really GitHub, so it shows you the host key fingerprint and asks. That is the model named in [section 3.9](#39-verify-you-are-talking-to-the-real-github): Trust On First Use. Answer yes and the key is appended here, and every later connection is checked against it silently.
+
+The value of the file is entirely in what happens when the check fails. If the key GitHub presents stops matching the line stored here, SSH refuses to connect and says `Host key verification failed`. That is the alarm working. It usually means GitHub rotated a key, and it occasionally means something is sitting between you and GitHub, which is the case the whole mechanism exists to catch.
+
+Each line is one host and one key, in the form `hostname keytype base64-key`, and GitHub gets several lines because it publishes a key of each type. Look at what you have:
+
+```bash
+ssh-keygen -F github.com
+```
+
+Remove a stale entry, after checking the new fingerprint against [section 3.9](#39-verify-you-are-talking-to-the-real-github) rather than before:
+
+```bash
+ssh-keygen -R github.com
+```
+
+You can also fill the file ahead of a first connection rather than being prompted, which is how the check gets made on a machine where nobody is watching, such as a build agent:
+
+```bash
+ssh-keyscan github.com >> ~/.ssh/known_hosts
+```
+
+That is only safe when you then compare what it fetched against GitHub's published fingerprints, because `ssh-keyscan` trusts whatever answers. Doing it without that check writes down whatever is on the wire and calls it trusted, which defeats the point.
+
+The file format is documented in the `sshd` manual under `SSH_KNOWN_HOSTS FILE FORMAT`: <https://man.openbsd.org/sshd.8>. The tool that reads and edits it is `ssh-keygen`: <https://man.openbsd.org/ssh-keygen.1>. The scanner is documented at <https://man.openbsd.org/ssh-keyscan.1>, and GitHub's current published fingerprints are at <https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/githubs-ssh-key-fingerprints>.
+
+### 5.3 Why neither file is a secret
+
+Both are ordinary text and neither holds anything private. `config` lists paths to keys rather than keys. `known_hosts` holds **public** host keys belonging to servers, not to you. Copying both to a new machine is reasonable and is a good way to carry your setup across, whereas copying a private key is the thing to think twice about.
+
+The permissions in [section 8](#8-file-permissions) still apply to `config`, though for a different reason than secrecy: SSH refuses to read a config file that other users can write, because anything able to rewrite it could silently point you at the wrong key or the wrong host.
+
+---
+
+## 6. Multiple GitHub accounts or keys
 
 **Run from:** `~/.ssh` to edit the config, then from wherever you keep your repositories to clone.
 
@@ -953,7 +1022,7 @@ Each test should greet you with the matching username.
 
 ---
 
-## 6. Optional: sign commits with the same SSH key
+## 7. Optional: sign commits with the same SSH key
 
 **Run from:** anywhere for the `git config --global` lines, then inside a repository for the `git log` verification at the end.
 
@@ -991,7 +1060,7 @@ Reference: <https://docs.github.com/en/authentication/managing-commit-signature-
 
 ---
 
-## 7. File permissions
+## 8. File permissions
 
 **Run from:** `~/.ssh`.
 
@@ -1029,7 +1098,7 @@ Symptom of wrong permissions: `WARNING: UNPROTECTED PRIVATE KEY FILE!` followed 
 
 ---
 
-## 8. Troubleshooting matrix
+## 9. Troubleshooting matrix
 
 Find the symptom in the first column, run the command in the third to confirm the cause, then apply the fix. The symptoms are written as the error text you will actually see:
 
@@ -1041,10 +1110,10 @@ Find the symptom in the first column, run the command in the third to confirm th
 | `ssh-agent` forgotten in every new Git Bash window | Each window spawns its own `ssh-agent` | `ps aux \| grep [s]sh-agent` shows several | The `~/.bashrc` block, [section 4](#4-start-the-ssh-agent-automatically-in-every-git-bash-window) |
 | Passphrase prompted on every `git push` | Git is calling a different ssh client than the one your `ssh-agent` belongs to | `git config --global --get core.sshCommand` | `git config --global --unset core.sshCommand` |
 | `Too many authentication failures` | `ssh-agent` offers many keys, the server cuts you off | `ssh -vT git@github.com` | Add `IdentitiesOnly yes` to `~/.ssh/config` |
-| Greeted as the wrong username | Wrong key matched first | `ssh -T git@github.com` | Host aliases, [section 5](#5-multiple-github-accounts-or-keys) |
+| Greeted as the wrong username | Wrong key matched first | `ssh -T git@github.com` | Host aliases, [section 6](#6-multiple-github-accounts-or-keys) |
 | `Host key verification failed` | Host key changed or `known_hosts` is stale | `ssh-keygen -F github.com` | Verify the fingerprint ([section 3.9](#39-verify-you-are-talking-to-the-real-github)), then `ssh-keygen -R github.com` |
 | `Connection timed out` on port 22 | Network blocks SSH | The `/dev/tcp` check in [section 3.8.5](#385-if-port-22-is-blocked-corporate-network-hotel-wifi) | Use port 443, [section 3.8.5](#385-if-port-22-is-blocked-corporate-network-hotel-wifi) |
-| `UNPROTECTED PRIVATE KEY FILE` | Permissions too open | `ls -l ~/.ssh/id_ed25519` | [Section 7](#7-file-permissions) |
+| `UNPROTECTED PRIVATE KEY FILE` | Permissions too open | `ls -l ~/.ssh/id_ed25519` | [Section 8](#8-file-permissions) |
 | `ssh-add` reports `Invalid format` | Key file mangled by an editor, or it is a PuTTY `.ppk` | `ssh-keygen -l -f ~/.ssh/id_ed25519` | Regenerate, or convert the `.ppk` with PuTTYgen |
 | Command hangs with no prompt | Git Bash TTY (TeleTYpe) issue | n/a | Prefix with `winpty` |
 | A path argument gets rewritten oddly | MSYS2 path conversion | n/a | Prefix with `MSYS_NO_PATHCONV=1` |
@@ -1052,7 +1121,7 @@ Find the symptom in the first column, run the command in the third to confirm th
 
 ---
 
-## 9. Full verification checklist
+## 10. Full verification checklist
 
 **Run from:** anywhere, `cd ~` is a fine default.
 
@@ -1090,7 +1159,7 @@ What each line should print, in the same order. If one does not match, the last 
 
 ---
 
-## 10. Cheat sheet
+## 11. Cheat sheet
 
 Once the setup works, this is the only section you should need again:
 
@@ -1126,7 +1195,7 @@ Once the setup works, this is the only section you should need again:
 
 ---
 
-## 11. Terminology
+## 12. Terminology
 
 Every acronym is also expanded where it first appears, so you can read straight through without coming here. This section is for looking one up later, so it carries every term the document uses, listed alphabetically.
 
@@ -1153,7 +1222,7 @@ Every acronym is also expanded where it first appears, so you can read straight 
 
 ---
 
-## 12. References (every link checked, HTTP 200)
+## 13. References (every link checked, HTTP 200)
 
 Every link below was fetched and returned HTTP (HyperText Transfer Protocol) status 200.
 
@@ -1168,3 +1237,6 @@ Every link below was fetched and returned HTTP (HyperText Transfer Protocol) sta
 9. `ssh_config` manual, every option for `~/.ssh/config`: <https://man.openbsd.org/ssh_config.5>
 10. `ssh` manual, the client that reads that file: <https://man.openbsd.org/ssh.1>
 11. `ssh-agent` manual, the key store it hands keys to: <https://man.openbsd.org/ssh-agent.1>
+12. `sshd` manual, which documents the `known_hosts` file format: <https://man.openbsd.org/sshd.8>
+13. `ssh-keygen` manual, the tool that reads and edits `known_hosts`: <https://man.openbsd.org/ssh-keygen.1>
+14. `ssh-keyscan` manual, for filling `known_hosts` ahead of a first connection: <https://man.openbsd.org/ssh-keyscan.1>
