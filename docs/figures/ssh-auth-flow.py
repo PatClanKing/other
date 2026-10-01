@@ -30,6 +30,12 @@ KEY_FILE = "#EDE7F6"   # your key pair, the two halves of your identity
 SH_FILE  = "#FFE0B2"   # a shell startup file
 REMOTE   = "#FCE4EC"   # GitHub
 
+# The marks are placed, never redrawn. See assets/README.md for where each comes from.
+ASSETS = Path(__file__).resolve().parent / "assets"
+GH_MARK = str(ASSETS / "github-mark.svg")
+# Every box that is a file on disk carries this, whatever role its colour gives it.
+FILE_MARK = str(ASSETS / "file-mark.svg")
+
 def _poly(pid, pts, close=True, colour=INK, width=2.4):
     pts = list(pts) + ([pts[0]] if close else [])
     d.polyline(pid, pts, arrow=False, colour=colour, width=width)
@@ -76,9 +82,10 @@ d.block("ssh", "ssh\n/usr/bin/ssh\nthe only one of these\nthat reads the config"
         430, 90, w=240, h=120, fill=PROC)
 
 # What ssh consults, fanned out below it so no route shares a lane.
-d.block("config", "~/.ssh/config\nHost github.com\n  IdentityFile ~/.ssh/id_ed25519\n"
+d.block("config", "\n~/.ssh/config\nHost github.com\n  IdentityFile ~/.ssh/id_ed25519\n"
                   "  IdentitiesOnly yes\n  AddKeysToAgent yes",
-        120, 380, w=280, h=130, fill=SSH_FILE)
+        120, 374, w=280, h=152, fill=SSH_FILE)
+d.image("config-mark", FILE_MARK, 260, 400, w=24)
 # Two parts on purpose. The writer paints every block over every polyline, so a
 # filled box would bury the glyph. The outer frame is therefore unfilled and carries
 # the drawing, and the caption sits in a filled panel below it, which also keeps the
@@ -87,19 +94,23 @@ d.block("agent", "", 440, 370, w=270, h=200, fill="none")
 agent_glyph(575, 424, s=0.46)
 d.block("agent-panel", "ssh-agent\nholds the decrypted key in memory,\nreached over $SSH_AUTH_SOCK",
         450, 462, w=250, h=98, fill=PROC)
-d.block("known", "~/.ssh/known_hosts\nhost keys this machine\nhas already trusted",
-        790, 380, w=250, h=110, fill=SSH_FILE)
+d.block("known", "\n~/.ssh/known_hosts\nhost keys this machine\nhas already trusted",
+        790, 374, w=250, h=132, fill=SSH_FILE)
+d.image("known-mark", FILE_MARK, 915, 400, w=24)
 
 # How the key reaches the agent.
-d.block("priv", "id_ed25519\nPRIVATE key\nnever leaves this machine",
-        760, 615, w=240, h=100, fill=KEY_FILE)
+d.block("priv", "\nid_ed25519\nPRIVATE key\nnever leaves this machine",
+        760, 592, w=240, h=120, fill=KEY_FILE)
+d.image("priv-mark", FILE_MARK, 880, 616, w=24)
 d.block("sshadd", "ssh-add\ndecrypts the private key\nwith your passphrase",
         450, 650, w=250, h=110, fill=CMD)
-d.block("bashrc", "~/.bashrc\nstarts one ssh-agent per\nlogin and loads the keys",
-        450, 890, w=250, h=100, fill=SH_FILE)
+d.block("bashrc", "\n~/.bashrc\nstarts one ssh-agent per\nlogin and loads the keys",
+        450, 880, w=250, h=120, fill=SH_FILE)
+d.image("bashrc-mark", FILE_MARK, 575, 904, w=24)
 
-d.block("pub", "id_ed25519.pub\nPUBLIC key\nsafe to publish",
-        760, 735, w=240, h=100, fill=KEY_FILE)
+d.block("pub", "\nid_ed25519.pub\nPUBLIC key\nsafe to publish",
+        760, 730, w=240, h=120, fill=KEY_FILE)
+d.image("pub-mark", FILE_MARK, 880, 754, w=24)
 
 d.add(Group("keypair", "your key pair, generated together", members=["priv", "pub"]))
 d.add(Group("machine", "Your machine, Git Bash on Windows",
@@ -107,9 +118,6 @@ d.add(Group("machine", "Your machine, Git Bash on Windows",
                      "keypair", "sshadd", "bashrc"], dashed=True))
 
 # ------------------------------------------------------------------- the far end
-# The mark is placed, never redrawn. See assets/README.md for where it comes from.
-GH_MARK = str(Path(__file__).resolve().parent / "assets" / "github-mark.svg")
-
 d.block("sshd", "\ngithub.com:22\nSSH endpoint\n(or ssh.github.com:443)",
         1500, 90, w=250, h=130, fill=REMOTE)
 d.image("sshd-mark", GH_MARK, 1625, 116, w=30)
@@ -157,7 +165,7 @@ d.link("sshd", "repo", "flow", "git protocol")
 d.text("t-key", "The private key never travels. ssh proves you hold it by having "
                 "the agent sign a challenge with it.", 60, 1040, size=14, bold=True)
 d.text("t-pair", "Blue = you run it.   Green = a running process.   Yellow = a file SSH reads.   "
-                 "Purple = your key pair.   Orange = a shell startup file.   Pink = GitHub.",
+                 "Purple = your key pair.   Orange = a shell startup file.   Pink = GitHub.   A page glyph marks every box that is a file on disk.",
        60, 1068, size=12)
 
 out = Path(__file__).with_suffix("")

@@ -5,13 +5,13 @@
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
         <mxCell id="machine" value="Your machine, Git Bash on Windows" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#37474F;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;fontStyle=1;fontSize=16;dashed=1;" vertex="1" parent="1">
-          <mxGeometry x="38" y="42" width="1024" height="970" as="geometry"/>
+          <mxGeometry x="38" y="42" width="1024" height="980" as="geometry"/>
         </mxCell>
         <mxCell id="github" value="GitHub" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#37474F;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;fontStyle=1;fontSize=16;dashed=1;" vertex="1" parent="1">
           <mxGeometry x="1128" y="42" width="644" height="980" as="geometry"/>
         </mxCell>
         <mxCell id="keypair" value="your key pair, generated together" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#37474F;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;fontStyle=1;fontSize=16;dashed=0;" vertex="1" parent="machine">
-          <mxGeometry x="700" y="525" width="284" height="290" as="geometry"/>
+          <mxGeometry x="700" y="502" width="284" height="328" as="geometry"/>
         </mxCell>
         <mxCell id="git" value="git push
 git clone / fetch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
@@ -23,12 +23,16 @@ the only one of these
 that reads the config" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
           <mxGeometry x="392" y="48" width="240" height="120" as="geometry"/>
         </mxCell>
-        <mxCell id="config" value="~/.ssh/config
+        <mxCell id="config" value="
+~/.ssh/config
 Host github.com
   IdentityFile ~/.ssh/id_ed25519
   IdentitiesOnly yes
   AddKeysToAgent yes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
-          <mxGeometry x="82" y="338" width="280" height="130" as="geometry"/>
+          <mxGeometry x="82" y="332" width="280" height="152" as="geometry"/>
+        </mxCell>
+        <mxCell id="config-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNiAzMiI+CiAgPHBhdGggZD0iTTMgMSBoMTQgbDYgNiB2MjQgaC0yMCB6IiBmaWxsPSJub25lIiBzdHJva2U9IiMxRjNBNUYiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTE3IDEgdjYgaDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFGM0E1RiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNyAxNCBoMTIgTTcgMTkgaDEyIE03IDI0IGg4IiBmaWxsPSJub25lIiBzdHJva2U9IiNCMzU0MUUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==;" vertex="1" parent="1">
+          <mxGeometry x="248" y="385" width="24" height="30" as="geometry"/>
         </mxCell>
         <mxCell id="agent" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
           <mxGeometry x="402" y="328" width="270" height="200" as="geometry"/>
@@ -187,30 +191,46 @@ holds the decrypted key in memory,
 reached over $SSH_AUTH_SOCK" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="1">
           <mxGeometry x="450" y="462" width="250" height="98" as="geometry"/>
         </mxCell>
-        <mxCell id="known" value="~/.ssh/known_hosts
+        <mxCell id="known" value="
+~/.ssh/known_hosts
 host keys this machine
 has already trusted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
-          <mxGeometry x="752" y="338" width="250" height="110" as="geometry"/>
+          <mxGeometry x="752" y="332" width="250" height="132" as="geometry"/>
         </mxCell>
-        <mxCell id="priv" value="id_ed25519
+        <mxCell id="known-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNiAzMiI+CiAgPHBhdGggZD0iTTMgMSBoMTQgbDYgNiB2MjQgaC0yMCB6IiBmaWxsPSJub25lIiBzdHJva2U9IiMxRjNBNUYiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTE3IDEgdjYgaDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFGM0E1RiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNyAxNCBoMTIgTTcgMTkgaDEyIE03IDI0IGg4IiBmaWxsPSJub25lIiBzdHJva2U9IiNCMzU0MUUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==;" vertex="1" parent="1">
+          <mxGeometry x="903" y="385" width="24" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="priv" value="
+id_ed25519
 PRIVATE key
 never leaves this machine" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="keypair">
-          <mxGeometry x="22" y="48" width="240" height="100" as="geometry"/>
+          <mxGeometry x="22" y="48" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="priv-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNiAzMiI+CiAgPHBhdGggZD0iTTMgMSBoMTQgbDYgNiB2MjQgaC0yMCB6IiBmaWxsPSJub25lIiBzdHJva2U9IiMxRjNBNUYiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTE3IDEgdjYgaDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFGM0E1RiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNyAxNCBoMTIgTTcgMTkgaDEyIE03IDI0IGg4IiBmaWxsPSJub25lIiBzdHJva2U9IiNCMzU0MUUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==;" vertex="1" parent="1">
+          <mxGeometry x="868" y="601" width="24" height="30" as="geometry"/>
         </mxCell>
         <mxCell id="sshadd" value="ssh-add
 decrypts the private key
 with your passphrase" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
           <mxGeometry x="412" y="608" width="250" height="110" as="geometry"/>
         </mxCell>
-        <mxCell id="bashrc" value="~/.bashrc
+        <mxCell id="bashrc" value="
+~/.bashrc
 starts one ssh-agent per
 login and loads the keys" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFE0B2;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="machine">
-          <mxGeometry x="412" y="848" width="250" height="100" as="geometry"/>
+          <mxGeometry x="412" y="838" width="250" height="120" as="geometry"/>
         </mxCell>
-        <mxCell id="pub" value="id_ed25519.pub
+        <mxCell id="bashrc-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNiAzMiI+CiAgPHBhdGggZD0iTTMgMSBoMTQgbDYgNiB2MjQgaC0yMCB6IiBmaWxsPSJub25lIiBzdHJva2U9IiMxRjNBNUYiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTE3IDEgdjYgaDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFGM0E1RiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNyAxNCBoMTIgTTcgMTkgaDEyIE03IDI0IGg4IiBmaWxsPSJub25lIiBzdHJva2U9IiNCMzU0MUUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==;" vertex="1" parent="1">
+          <mxGeometry x="563" y="889" width="24" height="30" as="geometry"/>
+        </mxCell>
+        <mxCell id="pub" value="
+id_ed25519.pub
 PUBLIC key
 safe to publish" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#37474F;strokeWidth=2;verticalAlign=middle;" vertex="1" parent="keypair">
-          <mxGeometry x="22" y="168" width="240" height="100" as="geometry"/>
+          <mxGeometry x="22" y="186" width="240" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="pub-mark" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=none;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNiAzMiI+CiAgPHBhdGggZD0iTTMgMSBoMTQgbDYgNiB2MjQgaC0yMCB6IiBmaWxsPSJub25lIiBzdHJva2U9IiMxRjNBNUYiIHN0cm9rZS13aWR0aD0iMS44IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CiAgPHBhdGggZD0iTTE3IDEgdjYgaDYiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFGM0E1RiIgc3Ryb2tlLXdpZHRoPSIxLjgiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNNyAxNCBoMTIgTTcgMTkgaDEyIE03IDI0IGg4IiBmaWxsPSJub25lIiBzdHJva2U9IiNCMzU0MUUiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==;" vertex="1" parent="1">
+          <mxGeometry x="868" y="739" width="24" height="30" as="geometry"/>
         </mxCell>
         <mxCell id="sshd" value="
 github.com:22
@@ -250,8 +270,8 @@ the remote repository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC
         <mxCell id="t-key" value="The private key never travels. ssh proves you hold it by having the agent sign a challenge with it." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontColor=#102027;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="60" y="1031" width="803" height="18" as="geometry"/>
         </mxCell>
-        <mxCell id="t-pair" value="Blue = you run it.   Green = a running process.   Yellow = a file SSH reads.   Purple = your key pair.   Orange = a shell startup file.   Pink = GitHub." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#102027;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry x="60" y="1059" width="1057" height="18" as="geometry"/>
+        <mxCell id="t-pair" value="Blue = you run it.   Green = a running process.   Yellow = a file SSH reads.   Purple = your key pair.   Orange = a shell startup file.   Pink = GitHub.   A page glyph marks every box that is a file on disk." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=12;fontColor=#102027;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1059" width="1440" height="18" as="geometry"/>
         </mxCell>
         <mxCell id="edge-0" value="runs" style="endArrow=blockThin;endFill=1;endSize=8;html=1;rounded=1;edgeStyle=none;strokeColor=#37474F;strokeWidth=2;fontSize=11;" edge="1" parent="1" source="git" target="ssh">
           <mxGeometry relative="1" as="geometry"/>
