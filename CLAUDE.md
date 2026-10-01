@@ -63,7 +63,7 @@ The full style is in the `technical-runbook` skill. The rules that get broken mo
 1. **No dashes in prose.** Not in sentences, list items, ranges or compound adjectives. A hyphenated program name goes in a code span, so `ssh-agent` rather than the bare word. Fenced blocks, inline code, file paths, URLs and table separator rows are exempt.
 2. **A step's number is its section number.** Never write "Step N" in a heading, because `3.4` already is step 4.
 3. **One command per fenced block**, each introduced by a line of prose saying what it does or what the reader should see next. The verification checklist is the one deliberate exception.
-4. **One source line per paragraph.** Do not hard wrap, because a single newline inside a paragraph renders as a `<br>` on GitHub.
+4. **One source line per paragraph.** Keep this as a style rule, not a rendering fix. GitHub renders a `.md` file the way the API's `markdown` mode does, where a bare newline inside a paragraph is a space, so hard wrapped prose does not actually break mid sentence. It does in a comment box, which is where that belief came from. A break has to be asked for with two trailing spaces, which is what the generated contents block uses.
 5. **Expand every acronym at first use**, and keep the glossary at the end complete and alphabetical.
 6. **No identifying information.** Use `<email>`, `<username>`, `<hostname>`, `<owner>/<repo>`. Service addresses such as `git@github.com` stay as they are.
 

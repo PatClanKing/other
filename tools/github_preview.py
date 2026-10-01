@@ -4,7 +4,8 @@
 Two rendering modes:
 
   api      (default) Posts the Markdown to https://api.github.com/markdown with
-           mode "gfm". This is GitHub's own renderer, so the HTML is identical to
+           mode "markdown", which is how github.com renders a file. This is GitHub's
+           own renderer, so the HTML is identical to
            what github.com produces: task list checkboxes, autolinks, tables,
            strikethrough, footnotes and hard line breaks all behave the same.
            The document is sent to GitHub for rendering. It is not stored or
@@ -207,7 +208,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 def render_via_api(markdown_text: str, context: str | None) -> str:
     """Ask GitHub to render the Markdown. Returns the HTML fragment."""
-    payload = {"text": markdown_text, "mode": "gfm"}
+    # "markdown", not "gfm". Both are GitHub's renderer, but "gfm" is how it renders
+    # a comment box, where every newline becomes a line break. A .md file in a
+    # repository is rendered the other way, where a bare newline is just a space.
+    # Using "gfm" here made the preview disagree with github.com on every wrapped
+    # paragraph, and silently hid a contents block that only held together in gfm.
+    payload = {"text": markdown_text, "mode": "markdown"}
     if context:
         payload["context"] = context
 
@@ -276,7 +282,9 @@ def render_offline(markdown_text: str) -> str:
         )
 
     converter = markdown.Markdown(
-        extensions=["extra", "sane_lists", "nl2br", "admonition"],
+        # No nl2br: github.com does not break on a bare newline when rendering a
+        # file, so adding one here would make the offline mode disagree with it.
+        extensions=["extra", "sane_lists", "admonition"],
     )
     return converter.convert(markdown_text)
 

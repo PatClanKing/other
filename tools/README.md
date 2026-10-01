@@ -10,22 +10,22 @@ The only output these tools produce is HTML. Code blocks in that HTML carry GitH
 
 ## Contents
 
-[1. What is here](#1-what-is-here)
-[2. Easiest route: `github_preview.bat`](#2-easiest-route-github_previewbat)
-&nbsp;&nbsp;&nbsp;&nbsp;[2.1 Four ways to invoke it](#21-four-ways-to-invoke-it)
-[3. Manual route](#3-manual-route)
-&nbsp;&nbsp;&nbsp;&nbsp;[3.1 Git Bash](#31-git-bash)
-&nbsp;&nbsp;&nbsp;&nbsp;[3.2 PowerShell](#32-powershell)
-&nbsp;&nbsp;&nbsp;&nbsp;[3.3 macOS and Linux](#33-macos-and-linux)
-[4. How the preview works](#4-how-the-preview-works)
-[5. Table of contents](#5-table-of-contents)
-[6. Removing identifying information](#6-removing-identifying-information)
-[7. Two defects the Markdown source hides](#7-two-defects-the-markdown-source-hides)
-&nbsp;&nbsp;&nbsp;&nbsp;[7.1 Blocks and tables nobody introduced](#71-blocks-and-tables-nobody-introduced)
-&nbsp;&nbsp;&nbsp;&nbsp;[7.2 Hard wrapped paragraphs](#72-hard-wrapped-paragraphs)
-[8. Command reference](#8-command-reference)
-&nbsp;&nbsp;&nbsp;&nbsp;[8.1 Examples](#81-examples)
-[9. Troubleshooting](#9-troubleshooting)
+[1. What is here](#1-what-is-here)  
+[2. Easiest route: `github_preview.bat`](#2-easiest-route-github_previewbat)  
+&nbsp;&nbsp;&nbsp;&nbsp;[2.1 Four ways to invoke it](#21-four-ways-to-invoke-it)  
+[3. Manual route](#3-manual-route)  
+&nbsp;&nbsp;&nbsp;&nbsp;[3.1 Git Bash](#31-git-bash)  
+&nbsp;&nbsp;&nbsp;&nbsp;[3.2 PowerShell](#32-powershell)  
+&nbsp;&nbsp;&nbsp;&nbsp;[3.3 macOS and Linux](#33-macos-and-linux)  
+[4. How the preview works](#4-how-the-preview-works)  
+[5. Table of contents](#5-table-of-contents)  
+[6. Removing identifying information](#6-removing-identifying-information)  
+[7. Two defects the Markdown source hides](#7-two-defects-the-markdown-source-hides)  
+&nbsp;&nbsp;&nbsp;&nbsp;[7.1 Blocks and tables nobody introduced](#71-blocks-and-tables-nobody-introduced)  
+&nbsp;&nbsp;&nbsp;&nbsp;[7.2 Hard wrapped paragraphs](#72-hard-wrapped-paragraphs)  
+[8. Command reference](#8-command-reference)  
+&nbsp;&nbsp;&nbsp;&nbsp;[8.1 Examples](#81-examples)  
+[9. Troubleshooting](#9-troubleshooting)  
 [10. Verified result](#10-verified-result)
 
 <!-- /toc -->
@@ -196,7 +196,7 @@ It reports every fenced block and table whose preceding line is a heading, a hor
 
 ### 7.2 Hard wrapped paragraphs
 
-GitHub Flavored Markdown turns a single newline inside a paragraph into a `<br>`. Prose wrapped at 100 columns in an editor therefore renders with ragged breaks mid sentence, at the author's width rather than the reader's.
+A comment box on GitHub turns a single newline into a `<br>`, and a `.md` file does not: a file is rendered the way the API's `markdown` mode renders it, where a bare newline is a space. So hard wrapped prose reads correctly on github.com, and this check is a style rule about keeping one paragraph on one line rather than a fix for a rendering fault. A real break is asked for with two trailing spaces.
 
 ```bash
 tools/.venv/Scripts/python.exe tools/lint/reflow_prose.py docs/github-ssh-setup.md --check

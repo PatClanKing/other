@@ -125,6 +125,13 @@ def render_toc(headings) -> str:
     behaviour `reflow_prose.py` exists to guard against in prose, relied on deliberately
     here.
 
+    Each line ends with two spaces, Markdown's explicit hard break. That is not
+    decoration. GitHub renders a .md file the way the API's "markdown" mode does, where
+    a bare newline inside a paragraph is a space and not a break, so without the two
+    spaces every entry runs into the next and the contents becomes one long paragraph.
+    The API's "gfm" mode does break on a bare newline, but that is how GitHub renders
+    comments, not files, and trusting it is what produced that bug in the first place.
+
     Indentation uses a non breaking space entity rather than literal spaces, because
     leading whitespace collapses in the rendered HTML and four literal spaces would be
     read as a code block instead.
@@ -135,7 +142,8 @@ def render_toc(headings) -> str:
     lines = ["## Contents", ""]
     for level, title, slug in headings:
         indent = "&nbsp;&nbsp;&nbsp;&nbsp;" * (level - top)
-        lines.append("%s[%s](#%s)" % (indent, title, slug))
+        lines.append("%s[%s](#%s)  " % (indent, title, slug))
+    lines[-1] = lines[-1].rstrip()
     return "\n".join(lines)
 
 

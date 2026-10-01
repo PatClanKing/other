@@ -1363,19 +1363,19 @@ body {
 <hr />
 <h2 id="1-git-bash-specifics-you-need-to-know-first">1. Git Bash specifics you need to know first</h2>
 <ol>
-<li><code>~</code> is your home directory and <code>~/.ssh</code> is where every key lives. Confirm where you are:<br />
-<code>bash
+<li><code>~</code> is your home directory and <code>~/.ssh</code> is where every key lives. Confirm where you are:
+   <code>bash
    echo "$HOME" &amp;&amp; pwd</code></li>
-<li>Git Bash ships its own OpenSSH at <code>/usr/bin/ssh</code>, and Git calls it by default. Leave <code>core.sshCommand</code> unset so <code>git</code>, <code>ssh</code> and <code>ssh-add</code> all use that one client and therefore one <code>ssh-agent</code>. Verify with:<br />
-<code>bash
-   which -a ssh &amp;&amp; git config --global --get core.sshCommand</code><br />
+<li>Git Bash ships its own OpenSSH at <code>/usr/bin/ssh</code>, and Git calls it by default. Leave <code>core.sshCommand</code> unset so <code>git</code>, <code>ssh</code> and <code>ssh-add</code> all use that one client and therefore one <code>ssh-agent</code>. Verify with:
+   <code>bash
+   which -a ssh &amp;&amp; git config --global --get core.sshCommand</code>
    You want <code>/usr/bin/ssh</code> and empty output.</li>
 <li>Drive letters are mounted under a single slash, so a folder like <code>C:\git\&lt;repo&gt;</code> is <code>/c/git/&lt;repo&gt;</code>.</li>
 <li>Paths starting with <code>/</code> are sometimes rewritten by MSYS2 (the Unix compatibility layer Git Bash is built on). If an argument gets mangled, prefix the command with <code>MSYS_NO_PATHCONV=1</code>.</li>
 <li>If an interactive prompt hangs or you see <code>the input device is not a TTY</code>, prefix the command with <code>winpty</code>, for example <code>winpty ssh -T git@github.com</code>.</li>
 <li><code>clip.exe</code> is the clipboard helper Git Bash gives you, used in <a href="#37-register-the-public-key-with-github-ranked">section 3.7</a>.</li>
-<li><strong>Every step below that runs a command starts with a "Run from" line</strong> telling you which directory to be in. Most steps work from anywhere because the paths are absolute, but the Git steps genuinely need you to be inside a repository. Check where you are at any time:<br />
-<code>bash
+<li><strong>Every step below that runs a command starts with a "Run from" line</strong> telling you which directory to be in. Most steps work from anywhere because the paths are absolute, but the Git steps genuinely need you to be inside a repository. Check where you are at any time:
+   <code>bash
    pwd</code></li>
 </ol>
 <hr />
@@ -1421,11 +1421,11 @@ body {
 </code></pre>
 <ol>
 <li>Confirm the winner is <code>/usr/bin/ssh</code>, the Git Bash OpenSSH, which is the assumption of this whole guide. Windows ships a second OpenSSH under <code>/c/Windows/System32/OpenSSH</code>, and that one keeps its own separate <code>ssh-agent</code>, so a key loaded here is invisible to it.</li>
-<li>Check which client Git itself will call:<br />
-<code>bash
-   git config --global --get core.sshCommand</code><br />
-   Empty output means Git uses <code>/usr/bin/ssh</code>, which is what you want. If it prints a path, clear it:<br />
-<code>bash
+<li>Check which client Git itself will call:
+   <code>bash
+   git config --global --get core.sshCommand</code>
+   Empty output means Git uses <code>/usr/bin/ssh</code>, which is what you want. If it prints a path, clear it:
+   <code>bash
    git config --global --unset core.sshCommand</code></li>
 </ol>
 <h4 id="312-do-keys-already-exist">3.1.2 Do keys already exist?</h4>

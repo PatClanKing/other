@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Join hard wrapped prose so GitHub does not render the wrapping as line breaks.
 
-GitHub Flavored Markdown treats a single newline inside a paragraph as a hard break and
-emits `<br>`. That is convenient in a comment box and wrong in a document: prose wrapped
-at some column in the editor renders with ragged breaks mid sentence, at whatever width
-the author's editor happened to use rather than the reader's window.
+A GitHub comment box treats a single newline inside a paragraph as a hard break and emits
+`<br>`. A rendered `.md` file does not: it is rendered the way the API's "markdown" mode
+renders it, where a bare newline is simply a space. So hard wrapped prose does read
+correctly on github.com, and this script is a style rule rather than a fix for a
+rendering fault. One paragraph on one line keeps the source and the page agreeing about
+where a sentence begins and ends, and it keeps a reflowed paragraph from showing up as a
+dozen changed lines in a diff. A deliberate break is asked for with two trailing spaces,
+which is left alone here.
 
     Everything here stays inside Git Bash. The commands are plain POSIX shell, so the same
     lines also
