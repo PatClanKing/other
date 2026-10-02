@@ -936,6 +936,72 @@ The first is that it is read, not executed. There is no ordering requirement bey
 ssh -G github.com
 ```
 
+Before and after is the clearest way to see what the file buys. With no `~/.ssh/config` at all, those are the settings SSH falls back to:
+
+```bash
+ssh -F /dev/null -G github.com | grep -E "^(user |identityfile|identitiesonly|addkeystoagent|serveraliveinterval)"
+```
+
+Seven candidate keys, no restriction on which get offered, and a username that is simply your local account:
+
+```text
+user <username>
+identitiesonly no
+serveraliveinterval 0
+identityfile ~/.ssh/id_rsa
+identityfile ~/.ssh/id_ecdsa
+identityfile ~/.ssh/id_ecdsa_sk
+identityfile ~/.ssh/id_ed25519
+identityfile ~/.ssh/id_ed25519_sk
+identityfile ~/.ssh/id_xmss
+identityfile ~/.ssh/id_dsa
+addkeystoagent false
+```
+
+That list is not harmless. SSH offers each key that actually exists, in turn, and most servers close the connection after five or six failures, which is where `Too many authentication failures` in [section 9](#9-troubleshooting-matrix) comes from. It is also why GitHub can greet you as the wrong account: it accepts the **first** key it recognises, not the one you meant.
+
+So without the file you have to say all of it on the command line every time:
+
+```bash
+ssh -T -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o AddKeysToAgent=yes -o ServerAliveInterval=60 git@github.com
+```
+
+Write the block from [section 3.10.2](#3102-create-the-file) and ask again:
+
+```bash
+ssh -G github.com | grep -E "^(user |identityfile|identitiesonly|addkeystoagent|serveraliveinterval)"
+```
+
+Seven candidate keys have collapsed to one, and every option you were typing is now the default for this host:
+
+```text
+user git
+identitiesonly yes
+serveraliveinterval 60
+identityfile ~/.ssh/id_ed25519
+addkeystoagent true
+```
+
+Which means the command you actually type is this, and it does the same thing:
+
+```bash
+ssh -T git@github.com
+```
+
+Each line in the block replaces one thing you would otherwise have to remember:
+
+| In `~/.ssh/config` | What it saves you typing | Without it |
+|--------------------|--------------------------|------------|
+| `HostName github.com` | the real address behind the name you type | you type the full address, and host aliases in [section 6](#6-multiple-github-accounts-or-keys) become impossible |
+| `User git` | the `git@` part | `git@github.com` instead of `github.com` |
+| `IdentityFile ~/.ssh/id_ed25519` | `-i ~/.ssh/id_ed25519` | SSH guesses from the seven defaults above |
+| `IdentitiesOnly yes` | `-o IdentitiesOnly=yes` | every key gets offered, risking the wrong account and `Too many authentication failures` |
+| `AddKeysToAgent yes` | `-o AddKeysToAgent=yes` | you run `ssh-add` by hand for any key not loaded at startup |
+| `ServerAliveInterval 60` | `-o ServerAliveInterval=60` | a firewall can drop a long push mid transfer |
+| `Port 443` | `-p 443` | the port 22 workaround in [section 3.8.5](#385-if-port-22-is-blocked-corporate-network-hotel-wifi) has to be typed each time |
+
+One thing the file does **not** change is the host key prompt on a first connection. That belongs to `known_hosts` and happens whatever your config says, which is [section 5.2](#52-sshknown_hosts-what-has-happened-before).
+
 The second is that the file does not have to exist. SSH has defaults for everything in it, so deleting it costs you convenience and nothing else. That makes it safe to experiment with: keep a copy, break it, and compare with `ssh -G`.
 
 Full keyword reference, one entry each: <https://man.openbsd.org/ssh_config.5>

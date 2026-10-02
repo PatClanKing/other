@@ -2065,6 +2065,87 @@ Identity added: /c/Users/&lt;username&gt;/.ssh/id_ed25519_personal (&lt;email&gt
 <p>The first is that it is read, not executed. There is no ordering requirement beyond first match winning, no syntax to learn beyond <code>Keyword value</code>, and an unknown keyword is an error rather than something silently ignored. Check what SSH concluded rather than what you wrote:</p>
 <pre><code class="language-bash">ssh -G github.com
 </code></pre>
+<p>Before and after is the clearest way to see what the file buys. With no <code>~/.ssh/config</code> at all, those are the settings SSH falls back to:</p>
+<pre><code class="language-bash">ssh -F /dev/null -G github.com | grep -E &quot;^(user |identityfile|identitiesonly|addkeystoagent|serveraliveinterval)&quot;
+</code></pre>
+<p>Seven candidate keys, no restriction on which get offered, and a username that is simply your local account:</p>
+<pre><code class="language-text">user &lt;username&gt;
+identitiesonly no
+serveraliveinterval 0
+identityfile ~/.ssh/id_rsa
+identityfile ~/.ssh/id_ecdsa
+identityfile ~/.ssh/id_ecdsa_sk
+identityfile ~/.ssh/id_ed25519
+identityfile ~/.ssh/id_ed25519_sk
+identityfile ~/.ssh/id_xmss
+identityfile ~/.ssh/id_dsa
+addkeystoagent false
+</code></pre>
+<p>That list is not harmless. SSH offers each key that actually exists, in turn, and most servers close the connection after five or six failures, which is where <code>Too many authentication failures</code> in <a href="#9-troubleshooting-matrix">section 9</a> comes from. It is also why GitHub can greet you as the wrong account: it accepts the <strong>first</strong> key it recognises, not the one you meant.</p>
+<p>So without the file you have to say all of it on the command line every time:</p>
+<pre><code class="language-bash">ssh -T -i ~/.ssh/id_ed25519 -o IdentitiesOnly=yes -o AddKeysToAgent=yes -o ServerAliveInterval=60 git@github.com
+</code></pre>
+<p>Write the block from <a href="#3102-create-the-file">section 3.10.2</a> and ask again:</p>
+<pre><code class="language-bash">ssh -G github.com | grep -E &quot;^(user |identityfile|identitiesonly|addkeystoagent|serveraliveinterval)&quot;
+</code></pre>
+<p>Seven candidate keys have collapsed to one, and every option you were typing is now the default for this host:</p>
+<pre><code class="language-text">user git
+identitiesonly yes
+serveraliveinterval 60
+identityfile ~/.ssh/id_ed25519
+addkeystoagent true
+</code></pre>
+<p>Which means the command you actually type is this, and it does the same thing:</p>
+<pre><code class="language-bash">ssh -T git@github.com
+</code></pre>
+<p>Each line in the block replaces one thing you would otherwise have to remember:</p>
+<table>
+<thead>
+<tr>
+<th>In <code>~/.ssh/config</code></th>
+<th>What it saves you typing</th>
+<th>Without it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>HostName github.com</code></td>
+<td>the real address behind the name you type</td>
+<td>you type the full address, and host aliases in <a href="#6-multiple-github-accounts-or-keys">section 6</a> become impossible</td>
+</tr>
+<tr>
+<td><code>User git</code></td>
+<td>the <code>git@</code> part</td>
+<td><code>git@github.com</code> instead of <code>github.com</code></td>
+</tr>
+<tr>
+<td><code>IdentityFile ~/.ssh/id_ed25519</code></td>
+<td><code>-i ~/.ssh/id_ed25519</code></td>
+<td>SSH guesses from the seven defaults above</td>
+</tr>
+<tr>
+<td><code>IdentitiesOnly yes</code></td>
+<td><code>-o IdentitiesOnly=yes</code></td>
+<td>every key gets offered, risking the wrong account and <code>Too many authentication failures</code></td>
+</tr>
+<tr>
+<td><code>AddKeysToAgent yes</code></td>
+<td><code>-o AddKeysToAgent=yes</code></td>
+<td>you run <code>ssh-add</code> by hand for any key not loaded at startup</td>
+</tr>
+<tr>
+<td><code>ServerAliveInterval 60</code></td>
+<td><code>-o ServerAliveInterval=60</code></td>
+<td>a firewall can drop a long push mid transfer</td>
+</tr>
+<tr>
+<td><code>Port 443</code></td>
+<td><code>-p 443</code></td>
+<td>the port 22 workaround in <a href="#385-if-port-22-is-blocked-corporate-network-hotel-wifi">section 3.8.5</a> has to be typed each time</td>
+</tr>
+</tbody>
+</table>
+<p>One thing the file does <strong>not</strong> change is the host key prompt on a first connection. That belongs to <code>known_hosts</code> and happens whatever your config says, which is <a href="#52-sshknown_hosts-what-has-happened-before">section 5.2</a>.</p>
 <p>The second is that the file does not have to exist. SSH has defaults for everything in it, so deleting it costs you convenience and nothing else. That makes it safe to experiment with: keep a copy, break it, and compare with <code>ssh -G</code>.</p>
 <p>Full keyword reference, one entry each: <a href="https://man.openbsd.org/ssh_config.5">https://man.openbsd.org/ssh_config.5</a></p>
 <h3 id="52-sshknown_hosts-what-has-happened-before">5.2 <code>~/.ssh/known_hosts</code>, what has happened before</h3>
