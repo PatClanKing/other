@@ -104,9 +104,11 @@ d.block("priv", "\nid_ed25519\nPRIVATE key\nnever leaves this machine",
 d.image("priv-mark", FILE_MARK, 880, 616, w=24)
 d.block("sshadd", "ssh-add\ndecrypts the private key\nwith your passphrase",
         450, 650, w=250, h=110, fill=CMD)
-d.block("bashrc", "\n~/.bashrc\nstarts one ssh-agent per\nlogin and loads the keys",
-        450, 880, w=250, h=120, fill=SH_FILE)
-d.image("bashrc-mark", FILE_MARK, 575, 904, w=24)
+# Moved left of ssh-add so both of its arrows have a clear line. It does two
+# separate things, and drawing only the second made the agent appear from nowhere.
+d.block("bashrc", "\n~/.bashrc\nread by every Git Bash\nwindow at startup",
+        80, 880, w=250, h=120, fill=SH_FILE)
+d.image("bashrc-mark", FILE_MARK, 205, 904, w=24)
 
 d.block("pub", "\nid_ed25519.pub\nPUBLIC key\nsafe to publish",
         760, 730, w=240, h=120, fill=KEY_FILE)
@@ -147,7 +149,10 @@ d.link("ssh", "agent", "flow", "asks to sign")
 # The agent got that key from ssh-add, which read it off disk.
 d.link("priv", "sshadd", "dependency", "reads")
 d.link("sshadd", "agent", "flow", "adds key")
-d.link("bashrc", "sshadd", "flow", "on first window")
+# Two arrows, because the startup block does two things: it starts the agent
+# itself, and separately it runs ssh-add to put the keys in it.
+d.link("bashrc", "agent", "flow", "starts one per login")
+d.link("bashrc", "sshadd", "flow", "then runs this to load the keys")
 
 # The server is identified before anything is sent.
 d.link("ssh", "known", "dependency", "checks host key")

@@ -958,6 +958,59 @@ Remove a stale entry, after checking the new fingerprint against [section 3.9](#
 ssh-keygen -R github.com
 ```
 
+Here is the whole thing end to end. Before the first connection there is nothing to find, so watch the exit code rather than the output, because there is none:
+
+```bash
+ssh-keygen -F github.com; echo "exit: $?"
+```
+
+An empty answer and exit **1** mean no entry yet:
+
+```text
+exit: 1
+```
+
+Connect for the first time, and SSH has nothing to compare against, so it stops and asks. The address in brackets varies, because GitHub answers from many:
+
+```text
+The authenticity of host 'github.com (<ip>)' can't be established.
+ED25519 key fingerprint is SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+```
+
+This is the one moment the whole mechanism exists for, and typing `yes` without reading is how people hand it away. Compare that `SHA256:` value against the published list in [section 3.9](#39-verify-you-are-talking-to-the-real-github) first.
+
+Better still, do not type `yes` at all. The third option in that prompt is the fingerprint itself: paste the value you expect, and SSH does the comparison for you, continuing only on an exact match and refusing otherwise:
+
+```text
+Are you sure you want to continue connecting (yes/no/[fingerprint])? SHA256:+DiY3wvvV6TuJJhbpZisF/zLDA0zPMSvHdkr4UvCOqU
+```
+
+Either way, SSH says what it wrote:
+
+```text
+Warning: Permanently added 'github.com' (ED25519) to the list of known hosts.
+```
+
+Ask the same question afterwards and it now has an answer, which is the whole difference the file makes:
+
+```bash
+ssh-keygen -F github.com
+```
+
+It names the file and the line the entry landed on:
+
+```text
+# Host github.com found: line 1
+```
+
+One thing catches people out here. Whether the hostname is stored in plain text or hashed depends on `HashKnownHosts`, so searching the file for `github.com` can find nothing even though the entry is there, and a hashed line begins `|1|` instead. Always ask `ssh-keygen` rather than grepping. Check which you have:
+
+```bash
+ssh -G github.com | grep hashknownhosts
+```
+
 You can also fill the file ahead of a first connection rather than being prompted, which is how the check gets made on a machine where nobody is watching, such as a build agent:
 
 ```bash
